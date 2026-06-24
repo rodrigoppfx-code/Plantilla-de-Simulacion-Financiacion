@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plantilla de Simulacion Financiacion</title>
+  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=github-pages-final">
+  <script>
+    window.FINANCING_APP_CONFIG = {
+      logoUrl: "assets/logo-avovite.png",
+      primaryColor: "#1f6b34",
+      accentColor: "#a75b2b",
+      defaults: {
+        companyName: "AVOVITE S.A.S.",
+        companyNit: "901446849-9",
+        advisorName: "",
+        clientName: "",
+        clientPhone: "",
+        clientEmail: "",
+        productName: "Vites",
+        quantity: 1,
+        unitPrice: 2580000,
+        discountPct: 22,
+        initialPayment: 2012400,
+        installmentCount: 5,
+        notes: "Propuesta v\u00e1lida \u00fanicamente por el d\u00eda de hoy. Los valores quedan sujetos a confirmaci\u00f3n de pago y disponibilidad."
+      }
+    };
+  </script>
+  <script defer src="assets/vendor/html2canvas.min.js"></script>
+  <script defer src="assets/vendor/jspdf.umd.min.js"></script>
+  <script defer src="assets/propuesta-financiacion.js?v=github-pages-final"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" data-logo></div>
+        <div class="brand-text">
+          <h1>Plantilla de Simulacion Financiacion</h1>
+          <p>Calcula descuentos, financiaci&oacute;n y calendario de pagos en una propuesta lista para enviar.</p>
+        </div>
+      </div>
+      <div class="today-pill">Valida solo hoy: <span data-out="todayLong"></span></div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel form-panel">
+        <div class="panel-header">
+          <h2>Datos de la propuesta</h2>
+          <p>Completa los campos principales y revisa la propuesta generada en tiempo real.</p>
+        </div>
+
+        <div class="form-body">
+          <input id="companyName" data-field="companyName" type="hidden">
+          <input id="companyNit" data-field="companyNit" type="hidden">
+          <input data-field="productName" type="hidden">
+
+          <div class="company-fixed">
+            <div class="company-fixed-logo" data-logo></div>
+            <div>
+              <strong>AVOVITE S.A.S.</strong>
+              <span>NIT: 901446849-9</span>
+            </div>
+          </div>
+
+          <div class="section-title">Asesor/a</div>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="advisorName">Nombre del asesor/a</label>
+              <input id="advisorName" data-field="advisorName" type="text" placeholder="Nombre de asesor/a">
+            </div>
+          </div>
+
+          <div class="section-title">Cliente</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="clientName">Nombre del cliente *</label>
+              <input id="clientName" data-field="clientName" type="text" placeholder="Ej. Jefferson Salguero" required>
+            </div>
+            <div class="field">
+              <label for="clientPhone">Tel&eacute;fono</label>
+              <input id="clientPhone" data-field="clientPhone" type="text" placeholder="Opcional">
+            </div>
+            <div class="field full">
+              <label for="clientEmail">Correo</label>
+              <input id="clientEmail" data-field="clientEmail" type="email" placeholder="Opcional">
+            </div>
+          </div>
+
+          <div class="section-title">Valores</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="quantity">Cantidad de Vites</label>
+              <input id="quantity" data-field="quantity" type="number" min="1" step="1">
+            </div>
+            <div class="field">
+              <label for="unitPrice">Valor unitario</label>
+              <input id="unitPrice" data-field="unitPrice" type="text" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="discountPct">% descuento</label>
+              <input id="discountPct" data-field="discountPct" type="number" min="0" max="100" step="0.01">
+            </div>
+            <div class="field">
+              <label for="initialPayment">Abono inicial / contado</label>
+              <input id="initialPayment" data-field="initialPayment" type="text" inputmode="numeric" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="section-title">Financiaci&oacute;n</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="installmentCount">N&uacute;mero de cuotas</label>
+              <input id="installmentCount" data-field="installmentCount" type="number" min="0" max="11" step="1">
+            </div>
+            <div class="field">
+              <label for="firstDueDate">Fecha primera cuota</label>
+              <input id="firstDueDate" data-field="firstDueDate" type="date">
+            </div>
+          </div>
+
+          <div class="payment-tools">
+            <button class="ghost-btn" type="button" data-action="autoPayments">Autorrellenar cuotas iguales</button>
+            <button class="ghost-btn" type="button" data-action="addPayment">Agregar cuota</button>
+          </div>
+
+          <div class="balance-check" data-balance-check></div>
+          <div class="payment-editor" data-payment-editor></div>
+
+          <div class="section-title">Nota</div>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="notes">Nota de validez</label>
+              <textarea id="notes" data-field="notes"></textarea>
+            </div>
+          </div>
+
+          <div class="error-panel" data-errors></div>
+
+          <div class="actions">
+            <button class="primary-btn" type="button" data-action="downloadPdf" data-requires-valid>Descargar PDF</button>
+            <button class="secondary-btn" type="button" data-action="downloadImage" data-requires-valid>Descargar imagen</button>
+            <button class="ghost-btn" type="button" data-action="reset">Restaurar</button>
+          </div>
+          <div class="status-line" data-status></div>
+        </div>
+      </aside>
+
+      <section class="preview-wrap">
+        <div class="panel proposal-toolbar">
+          <strong>Vista previa para el cliente</strong>
+        </div>
+
+        <div class="proposal">
+          <article class="proposal-document" id="proposalDocument">
+            <section class="proposal-hero">
+              <div class="proposal-title">
+                <h2>Propuesta comercial</h2>
+                <p>Opci&oacute;n para avanzar hoy con tus Vites.</p>
+              </div>
+              <div class="proposal-logo-box" data-logo></div>
+            </section>
+
+            <div class="validity-band">
+              <span>Propuesta &uacute;nicamente v&aacute;lida hasta hoy</span>
+              <span data-out="validUntil"></span>
+            </div>
+
+            <section class="proposal-body">
+              <div class="client-line">
+                <div>
+                  <p>Datos del cliente</p>
+                  <h3 data-out="clientName"></h3>
+                  <div class="client-contact" data-client-contact></div>
+                </div>
+                <div class="meta">
+                  <p><strong data-out="companyName"></strong></p>
+                  <p>NIT: <span data-out="companyNit"></span></p>
+                  <p>Asesor/a: <span data-out="advisorName"></span></p>
+                </div>
+              </div>
+
+              <div class="summary-grid">
+                <div class="metric">
+                  <span>Cantidad de Vites</span>
+                  <strong data-out="quantity"></strong>
+                </div>
+                <div class="metric">
+                  <span>Valor unitario</span>
+                  <strong data-out="unitPrice"></strong>
+                </div>
+                <div class="metric">
+                  <span>Valor total</span>
+                  <strong data-out="gross"></strong>
+                </div>
+                <div class="metric">
+                  <span>Descuento</span>
+                  <strong data-out="discountPct"></strong>
+                </div>
+              </div>
+
+              <div class="savings-callout">
+                <div>
+                  <p>Valor neto a pagar</p>
+                  <strong data-out="net"></strong>
+                </div>
+                <div>
+                  <p>Te ganas con tu descuento</p>
+                  <strong data-out="discountAmount"></strong>
+                </div>
+              </div>
+
+              <div class="payment-section">
+                <div class="payment-box">
+                  <h4>Resumen del plan</h4>
+                  <div class="payment-highlight">
+                    <span>Abono inicial / contado</span>
+                    <strong data-out="initialPayment"></strong>
+                    <span class="payment-date">Pago: <span data-out="validUntilCompact"></span></span>
+                  </div>
+                  <div class="payment-highlight">
+                    <span>Saldo financiado</span>
+                    <strong data-out="balance"></strong>
+                    <span>A <span data-out="installmentLabel"></span></span>
+                  </div>
+                </div>
+
+                <div class="payment-box">
+                  <h4>Fechas de pago</h4>
+                  <div class="schedule" data-schedule></div>
+                </div>
+              </div>
+            </section>
+
+            <footer class="proposal-footer">
+              <p data-out="notes"></p>
+            </footer>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
