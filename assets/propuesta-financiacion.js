@@ -589,11 +589,20 @@
     const commaCount = (raw.match(/,/g) || []).length;
     if (commaCount > 0) {
       normalized = normalized.replace(/\./g, "").replace(/,/g, ".");
-    } else if (dotCount > 1) {
+    } else if (dotCount > 0 && looksLikeThousandsWithDots(normalized)) {
       normalized = normalized.replace(/\./g, "");
     }
     const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function looksLikeThousandsWithDots(value) {
+    const normalized = String(value || "").replace(/^-/, "");
+    const parts = normalized.split(".");
+    if (parts.length < 2) return false;
+    return parts[0].length >= 1 &&
+      parts[0].length <= 3 &&
+      parts.slice(1).every((part) => /^\d{3}$/.test(part));
   }
 
   function distributeAmount(total, count) {
