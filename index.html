@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plantilla de Simulacion Financiacion</title>
-  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=fix-money-dot-1">
+  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=form-modes-1">
   <script>
     window.FINANCING_APP_CONFIG = {
       logoUrl: "assets/logo-avovite.png",
@@ -22,14 +22,15 @@
         unitPrice: 2580000,
         discountPct: 22,
         initialPayment: 2012400,
-        installmentCount: 5,
+        installmentCount: 0,
+        paymentMode: "cash",
         notes: "Propuesta v\u00e1lida \u00fanicamente por el d\u00eda de hoy. Los valores quedan sujetos a confirmaci\u00f3n de pago y disponibilidad."
       }
     };
   </script>
   <script defer src="assets/vendor/html2canvas.min.js"></script>
   <script defer src="assets/vendor/jspdf.umd.min.js"></script>
-  <script defer src="assets/propuesta-financiacion.js?v=fix-money-dot-1"></script>
+  <script defer src="assets/propuesta-financiacion.js?v=form-modes-1"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -55,6 +56,7 @@
           <input id="companyName" data-field="companyName" type="hidden">
           <input id="companyNit" data-field="companyNit" type="hidden">
           <input data-field="productName" type="hidden">
+          <input id="paymentMode" data-field="paymentMode" type="hidden">
 
           <div class="company-fixed">
             <div class="company-fixed-logo" data-logo></div>
@@ -95,20 +97,49 @@
               <input id="quantity" data-field="quantity" type="number" min="1" step="1">
             </div>
             <div class="field">
-              <label for="unitPrice">Valor unitario</label>
+              <label for="unitPrice">Valor unitario por Vite</label>
               <input id="unitPrice" data-field="unitPrice" type="text" inputmode="numeric" autocomplete="off">
             </div>
             <div class="field">
-              <label for="discountPct">% descuento</label>
+              <label for="discountPct">Porcentaje de descuento</label>
               <input id="discountPct" data-field="discountPct" type="number" min="0" max="100" step="0.01">
             </div>
             <div class="field">
-              <label for="initialPayment">Abono inicial / contado</label>
-              <input id="initialPayment" data-field="initialPayment" type="text" inputmode="numeric" autocomplete="off">
+              <label for="totalPayable">Valor total a pagar</label>
+              <input id="totalPayable" data-total-payable type="text" readonly>
             </div>
           </div>
 
-          <div class="section-title">Financiaci&oacute;n</div>
+          <div class="section-title">Forma de pago</div>
+          <div class="payment-mode" data-payment-mode-selector>
+            <button class="mode-card" type="button" data-payment-mode-option="cash">
+              <strong><span class="mode-check">✓</span> Pagar de contado</strong>
+              <span>Rellena el valor total a pagar y deja la propuesta sin cuotas.</span>
+            </button>
+            <button class="mode-card" type="button" data-payment-mode-option="financed">
+              <strong><span class="mode-check">✓</span> Financiado</strong>
+              <span>Permite abono inicial y cuotas editables.</span>
+            </button>
+          </div>
+
+          <div class="cash-note" data-cash-section>
+            Pago de contado seleccionado: el abono cubre el valor total a pagar.
+          </div>
+
+          <div data-financed-section>
+          <div class="section-title">Abono inicial</div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="initialPayment">Abono inicial</label>
+              <input id="initialPayment" data-field="initialPayment" type="text" inputmode="numeric" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="initialPaymentDate">Fecha abono inicial</label>
+              <input id="initialPaymentDate" data-field="initialPaymentDate" type="date">
+            </div>
+          </div>
+
+          <div class="section-title">Cuotas</div>
           <div class="field-grid">
             <div class="field">
               <label for="installmentCount">N&uacute;mero de cuotas</label>
@@ -127,6 +158,7 @@
 
           <div class="balance-check" data-balance-check></div>
           <div class="payment-editor" data-payment-editor></div>
+          </div>
 
           <div class="section-title">Nota</div>
           <div class="field-grid">
@@ -217,7 +249,7 @@
                   <div class="payment-highlight">
                     <span>Abono inicial / contado</span>
                     <strong data-out="initialPayment"></strong>
-                    <span class="payment-date">Pago: <span data-out="validUntilCompact"></span></span>
+                    <span class="payment-date">Pago: <span data-out="initialPaymentDateCompact"></span></span>
                   </div>
                   <div class="payment-highlight">
                     <span>Saldo financiado</span>

@@ -15,8 +15,10 @@
       unitPrice: 2580000,
       discountPct: 22,
       initialPayment: 2012400,
-      installmentCount: 5,
+      initialPaymentDate: toISODate(today),
+      installmentCount: 0,
       firstDueDate: toISODate(addMonths(today, 1)),
+      paymentMode: "cash",
       notes:
         "Propuesta v\u00e1lida \u00fanicamente por el d\u00eda de hoy. Los valores quedan sujetos a confirmaci\u00f3n de pago y disponibilidad."
     },
@@ -35,8 +37,10 @@
     "unitPrice",
     "discountPct",
     "initialPayment",
+    "initialPaymentDate",
     "installmentCount",
     "firstDueDate",
+    "paymentMode",
     "notes"
   ];
 
@@ -78,6 +82,8 @@
       }
     });
 
+    syncFirstDueDateFromInitialDate();
+    applyPaymentMode(readPaymentMode(), { keepFinancedValues: true });
     formatMoneyInputs();
 
     const editor = document.querySelector("[data-payment-editor]");
@@ -102,6 +108,11 @@
     bindClick("[data-action='downloadPdf']", downloadPDF);
     bindClick("[data-action='downloadImage']", downloadImage);
     bindClick("[data-action='reset']", resetForm);
+    document.querySelectorAll("[data-payment-mode-option]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setPaymentMode(button.dataset.paymentModeOption);
+      });
+    });
 
     autoFillPayments();
     render();
@@ -112,11 +123,84 @@
     if (node) node.addEventListener("click", handler);
   }
 
+  function setPaymentMode(mode) {
+    const normalizedMode = mode === "financed" ? "financed" : "cash";
+    if (readPaymentMode() === normalizedMode) return;
+
+    if (els.paymentMode) els.paymentMode.value = normalizedMode;
+    state.paymentsManual = false;
+
+    if (normalizedMode === "cash") {
+      syncCashPayment();
+    } else {
+      if (els.initialPayment) els.initialPayment.value = money(0);
+      if (els.installmentCount) els.installmentCount.value = 5;
+      syncFirstDueDateFromInitialDate();
+      autoFillPayments();
+    }
+
+    formatMoneyInputs();
+    render();
+  }
+
+  function applyPaymentMode(mode, options) {
+    const normalizedMode = mode === "financed" ? "financed" : "cash";
+    if (els.paymentMode) els.paymentMode.value = normalizedMode;
+
+    if (normalizedMode === "cash") {
+      syncCashPayment();
+      return;
+    }
+
+    if (!options || !options.keepFinancedValues) {
+      if (els.initialPayment) els.initialPayment.value = money(0);
+      if (els.installmentCount && readNumber("installmentCount") < 1) els.installmentCount.value = 5;
+    }
+
+    syncFirstDueDateFromInitialDate();
+    autoFillPayments();
+  }
+
+  function readPaymentMode() {
+    return readText("paymentMode") === "financed" ? "financed" : "cash";
+  }
+
+  function syncCashPayment() {
+    const net = calculateNetAmount();
+    if (els.initialPayment) els.initialPayment.value = money(net);
+    if (els.initialPaymentDate && !readText("initialPaymentDate")) {
+      els.initialPaymentDate.value = toISODate(today);
+    }
+    if (els.installmentCount) els.installmentCount.value = 0;
+    syncFirstDueDateFromInitialDate();
+    state.payments = [];
+    state.paymentsManual = false;
+  }
+
+  function syncFirstDueDateFromInitialDate() {
+    if (!els.firstDueDate) return;
+    const initialDate = parseISODate(readText("initialPaymentDate")) || today;
+    els.firstDueDate.value = toISODate(addMonths(initialDate, 1));
+  }
+
+  function calculateNetAmount() {
+    const quantity = readNumber("quantity");
+    const unitPrice = readNumber("unitPrice");
+    const discountPct = clamp(readNumber("discountPct"), 0, 100);
+    return quantity * unitPrice * (1 - discountPct / 100);
+  }
+
   function handleFieldChange(event) {
     const field = event.target.dataset.field;
     if (!field) return;
 
-    if (field === "installmentCount" || field === "firstDueDate") {
+    if (readPaymentMode() === "cash" && coreAmountFields.has(field)) {
+      syncCashPayment();
+    } else if (field === "initialPaymentDate") {
+      syncFirstDueDateFromInitialDate();
+      state.paymentsManual = false;
+      autoFillPayments();
+    } else if (field === "installmentCount" || field === "firstDueDate") {
       state.paymentsManual = false;
       autoFillPayments();
     } else if (coreAmountFields.has(field) && !state.paymentsManual) {
@@ -167,7 +251,7 @@
       }
     });
     state.paymentsManual = false;
-    autoFillPayments();
+    applyPaymentMode(readPaymentMode(), { keepFinancedValues: true });
     renderStatus("Valores base restaurados.");
     render();
     formatMoneyInputs();
@@ -178,7 +262,9 @@
     const unitPrice = readNumber("unitPrice");
     const discountPct = readNumber("discountPct");
     const initialPayment = readNumber("initialPayment");
-    const firstDueDate = parseISODate(readText("firstDueDate")) || addMonths(today, 1);
+    const initialPaymentDate = parseISODate(readText("initialPaymentDate")) || today;
+    const firstDueDate = parseISODate(readText("firstDueDate")) || addMonths(initialPaymentDate, 1);
+    const paymentMode = readPaymentMode();
     const gross = quantity * unitPrice;
     const discountRate = discountPct / 100;
     const discountAmount = gross * discountRate;
@@ -197,13 +283,15 @@
       discountedUnit,
       initialPayment,
       balance,
-      firstDueDate
+      firstDueDate,
+      initialPaymentDate,
+      paymentMode
     };
   }
 
   function calculate() {
     const base = calculateBase();
-    const schedule = base.balance > 0 ? sanitizePayments(state.payments) : [];
+    const schedule = base.paymentMode === "financed" && base.balance > 0 ? sanitizePayments(state.payments) : [];
     const paymentSum = schedule.reduce((sum, item) => sum + item.amount, 0);
     const collectedTotal = base.initialPayment + paymentSum;
     const difference = Math.round(base.net) - Math.round(collectedTotal);
@@ -216,14 +304,14 @@
     if (base.initialPayment < 0) errors.push("El abono inicial no puede ser negativo.");
     if (base.initialPayment > base.net) errors.push("El abono inicial no puede superar el valor neto a pagar.");
     if (schedule.length > MAX_INSTALLMENTS) errors.push(`El m\u00e1ximo permitido es ${MAX_INSTALLMENTS} cuotas.`);
-    if (base.balance > 0 && schedule.length < 1) errors.push("Si queda saldo financiado, agrega al menos 1 cuota.");
-    if (base.balance > 0 && schedule.some((item) => item.amount <= 0)) {
+    if (base.paymentMode === "financed" && base.balance > 0 && schedule.length < 1) errors.push("Si queda saldo financiado, agrega al menos 1 cuota.");
+    if (base.paymentMode === "financed" && base.balance > 0 && schedule.some((item) => item.amount <= 0)) {
       errors.push("Todas las cuotas deben tener un valor mayor a cero.");
     }
-    if (base.balance > 0 && schedule.some((item) => !item.date)) {
+    if (base.paymentMode === "financed" && base.balance > 0 && schedule.some((item) => !item.date)) {
       errors.push("Todas las cuotas deben tener fecha de pago.");
     }
-    if (base.balance > 0 && Math.abs(difference) > 1) {
+    if (base.paymentMode === "financed" && base.balance > 0 && Math.abs(difference) > 1) {
       const word = difference > 0 ? "faltan" : "sobran";
       errors.push(`La propuesta no cierra en $0: ${word} ${money(Math.abs(difference))}.`);
     }
@@ -254,6 +342,7 @@
       todayShort: formatShortDate(today),
       validUntil: formatDate(today),
       validUntilCompact: formatCompactDate(today),
+      initialPaymentDateCompact: formatCompactDate(result.initialPaymentDate),
       quantity: formatNumber(result.quantity),
       unitPrice: money(result.unitPrice),
       gross: money(result.gross),
@@ -274,6 +363,8 @@
     };
 
     setOutputs(values);
+    renderComputedFields(values);
+    renderPaymentMode(result);
     renderClientContact(values);
     renderSchedule(result);
     if (!options || !options.skipPaymentEditor) renderPaymentEditor(result);
@@ -289,6 +380,26 @@
       }
     });
     document.title = `Plantilla de Simulacion Financiacion - ${values.clientName}`;
+  }
+
+  function renderComputedFields(values) {
+    const totalPayable = document.querySelector("[data-total-payable]");
+    if (totalPayable) totalPayable.value = values.net;
+  }
+
+  function renderPaymentMode(result) {
+    const mode = result.paymentMode || readPaymentMode();
+    document.querySelectorAll("[data-payment-mode-option]").forEach((button) => {
+      const active = button.dataset.paymentModeOption === mode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+
+    const financedSection = document.querySelector("[data-financed-section]");
+    if (financedSection) financedSection.hidden = mode !== "financed";
+
+    const cashSection = document.querySelector("[data-cash-section]");
+    if (cashSection) cashSection.hidden = mode !== "cash";
   }
 
   function renderClientContact(values) {
@@ -373,6 +484,12 @@
     const node = document.querySelector("[data-balance-check]");
     if (!node) return;
 
+    if (result.paymentMode === "cash") {
+      node.className = "balance-check ok";
+      node.textContent = `Pago de contado: ${money(result.net)} cubre el valor total a pagar.`;
+      return;
+    }
+
     if (Math.abs(result.difference) <= 1) {
       node.className = "balance-check ok";
       node.textContent = `Cierre en $0: abono inicial + cuotas = ${money(result.collectedTotal)}.`;
@@ -407,6 +524,12 @@
   }
 
   function autoFillPayments() {
+    if (readPaymentMode() === "cash") {
+      state.payments = [];
+      if (els.installmentCount) els.installmentCount.value = 0;
+      return;
+    }
+
     const base = calculateBase();
     let count = clamp(Math.floor(readNumber("installmentCount") || 0), 0, MAX_INSTALLMENTS);
     if (base.balance <= 0) count = 0;

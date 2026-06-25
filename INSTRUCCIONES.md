@@ -13,9 +13,11 @@
 2. Llena asesor/a, cliente y datos de financiacion. La razon social, NIT y logo de Avovite ya vienen cargados.
 3. La fecha de validez se coloca sola con la fecha del dia.
 4. El sistema calcula automaticamente total, descuento, ahorro, neto y saldo financiado.
-5. Las cuotas se autorrellenan en valores iguales, pero puedes editar cada valor y fecha.
-6. Puedes agregar o eliminar cuotas hasta maximo 11.
-7. Descarga la propuesta en PDF o imagen.
+5. Selecciona `Pagar de contado` para completar el valor total sin cuotas.
+6. Selecciona `Financiado` para ingresar abono inicial y cuotas.
+7. Las cuotas se autorrellenan en valores iguales, pero puedes editar cada valor y fecha.
+8. Puedes agregar o eliminar cuotas hasta maximo 11.
+9. Descarga la propuesta en PDF o imagen.
 
 ## Para publicarlo en GitHub Pages
 

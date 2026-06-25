@@ -304,6 +304,82 @@ textarea {
   box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.15);
 }
 
+.field input[readonly] {
+  color: var(--brand-primary-dark);
+  background: var(--surface-muted);
+  font-weight: 850;
+}
+
+.payment-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.mode-card {
+  display: grid;
+  gap: 5px;
+  min-height: 82px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.mode-card strong {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--brand-primary-dark);
+  font-size: 0.9rem;
+}
+
+.mode-card span:last-child {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.28;
+}
+
+.mode-check {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #b8c7bd;
+  border-radius: 50%;
+  color: transparent;
+  background: #fff;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.mode-card.active {
+  border-color: rgba(var(--brand-rgb), 0.38);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.08);
+}
+
+.mode-card.active .mode-check {
+  color: #fff;
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+}
+
+.cash-note {
+  margin-top: 10px;
+  border: 1px solid rgba(var(--brand-rgb), 0.18);
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: var(--brand-primary-dark);
+  background: rgba(var(--brand-rgb), 0.08);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
 .payment-tools {
   display: grid;
   grid-template-columns: 1fr;
@@ -885,6 +961,7 @@ textarea {
 
   .field-grid,
   .payment-tools,
+  .payment-mode,
   .payment-section {
     grid-template-columns: 1fr;
   }
