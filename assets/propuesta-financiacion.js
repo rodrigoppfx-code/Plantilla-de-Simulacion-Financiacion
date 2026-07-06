@@ -710,7 +710,7 @@
     state.installmentCalculator = calc;
     resultNode.className = `calculator-result ${calc.valid ? "ok" : "warn"}`;
     resultNode.innerHTML = calc.valid
-      ? `<span>Simulacion lista</span><strong>${calc.count} ${calc.count === 1 ? "cuota" : "cuotas"} por ${money(calc.total)}</strong><em>Saldo pendiente: ${money(Math.abs(calc.difference))}</em>`
+      ? `<span>Simulacion lista</span><strong>Total cuotas: ${money(calc.total)}</strong><em>Diferencia con saldo a financiar: ${money(Math.abs(calc.difference))}</em>`
       : `<span>Revisa los valores</span><strong>${escapeHTML(calc.message)}</strong>`;
 
     previewNode.innerHTML = calc.payments.length
@@ -1011,7 +1011,7 @@
     if (count <= 0) return [];
     const base = Math.floor(roundedTotal / count);
     const remainder = roundedTotal - base * count;
-    return Array.from({ length: count }, (_, index) => base + (index === count - 1 ? remainder : 0));
+    return Array.from({ length: count }, (_, index) => base + (index < remainder ? 1 : 0));
   }
 
   function money(value) {
@@ -1030,7 +1030,7 @@
   }
 
   function formatDecimalInput(value) {
-    const rounded = Math.round((Number(value) || 0) * 100) / 100;
+    const rounded = Math.round((Number(value) || 0) * 100000000) / 100000000;
     return String(rounded).replace(/\.?0+$/, "");
   }
 
