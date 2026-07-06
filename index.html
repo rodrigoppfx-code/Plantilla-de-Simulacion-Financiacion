@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plantilla de Simulacion Financiacion</title>
-  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=form-modes-1">
+  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=support-calcs-1">
   <script>
     window.FINANCING_APP_CONFIG = {
       logoUrl: "assets/logo-avovite.png",
@@ -30,7 +30,7 @@
   </script>
   <script defer src="assets/vendor/html2canvas.min.js"></script>
   <script defer src="assets/vendor/jspdf.umd.min.js"></script>
-  <script defer src="assets/propuesta-financiacion.js?v=form-modes-1"></script>
+  <script defer src="assets/propuesta-financiacion.js?v=support-calcs-1"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -158,6 +158,62 @@
 
           <div class="balance-check" data-balance-check></div>
           <div class="payment-editor" data-payment-editor></div>
+          </div>
+
+          <div class="section-title">Calculadoras de apoyo</div>
+          <div class="support-tools" aria-label="Calculadoras de apoyo para asesoras">
+            <section class="support-tool">
+              <div class="support-tool-header">
+                <div>
+                  <h3>Calcular descuento</h3>
+                  <p>Usa el valor bruto y el valor final ofrecido para encontrar el porcentaje exacto.</p>
+                </div>
+                <button class="text-btn" type="button" data-action="syncDiscountCalculator">Usar datos actuales</button>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="discountCalcGross">Valor bruto</label>
+                  <input id="discountCalcGross" data-discount-calc="gross" data-support-money type="text" inputmode="numeric" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="discountCalcFinal">Valor final para cliente</label>
+                  <input id="discountCalcFinal" data-discount-calc="final" data-support-money type="text" inputmode="numeric" autocomplete="off">
+                </div>
+              </div>
+              <div class="calculator-result" data-discount-result></div>
+              <button class="secondary-btn support-action" type="button" data-action="applyDiscountCalculator">Aplicar descuento a la propuesta</button>
+            </section>
+
+            <section class="support-tool">
+              <div class="support-tool-header">
+                <div>
+                  <h3>Calcular cuotas</h3>
+                  <p>Sirve para simular una primera cuota diferente y repartir el saldo restante en cuotas iguales.</p>
+                </div>
+                <button class="text-btn" type="button" data-action="syncInstallmentCalculator">Usar datos actuales</button>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="installmentCalcBalance">Saldo a financiar</label>
+                  <input id="installmentCalcBalance" data-installment-calc="balance" data-support-money type="text" inputmode="numeric" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="installmentCalcCount">N&uacute;mero total de cuotas</label>
+                  <input id="installmentCalcCount" data-installment-calc="count" type="number" min="1" max="11" step="1">
+                </div>
+                <div class="field">
+                  <label for="installmentCalcFirstAmount">Valor cuota 1 opcional</label>
+                  <input id="installmentCalcFirstAmount" data-installment-calc="firstAmount" data-support-money type="text" inputmode="numeric" autocomplete="off" placeholder="Si queda vacio, divide todo igual">
+                </div>
+                <div class="field">
+                  <label for="installmentCalcFirstDate">Fecha cuota 1</label>
+                  <input id="installmentCalcFirstDate" data-installment-calc="firstDate" type="date">
+                </div>
+              </div>
+              <div class="calculator-result" data-installment-result></div>
+              <div class="support-preview" data-installment-preview></div>
+              <button class="secondary-btn support-action" type="button" data-action="applyInstallmentCalculator">Aplicar cuotas a la propuesta</button>
+            </section>
           </div>
 
           <div class="section-title">Nota</div>

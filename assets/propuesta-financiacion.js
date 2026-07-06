@@ -51,6 +51,12 @@
     logoUrl: config.logoUrl || "",
     payments: [],
     paymentsManual: false,
+    supportCalcTouched: {
+      discount: false,
+      installments: false
+    },
+    discountCalculator: null,
+    installmentCalculator: null,
     lastResult: null
   };
 
@@ -108,12 +114,17 @@
     bindClick("[data-action='downloadPdf']", downloadPDF);
     bindClick("[data-action='downloadImage']", downloadImage);
     bindClick("[data-action='reset']", resetForm);
+    bindClick("[data-action='syncDiscountCalculator']", syncDiscountCalculatorFromProposal);
+    bindClick("[data-action='applyDiscountCalculator']", applyDiscountCalculator);
+    bindClick("[data-action='syncInstallmentCalculator']", syncInstallmentCalculatorFromProposal);
+    bindClick("[data-action='applyInstallmentCalculator']", applyInstallmentCalculator);
     document.querySelectorAll("[data-payment-mode-option]").forEach((button) => {
       button.addEventListener("click", () => {
         setPaymentMode(button.dataset.paymentModeOption);
       });
     });
 
+    bindSupportCalculators();
     autoFillPayments();
     render();
   }
@@ -121,6 +132,104 @@
   function bindClick(selector, handler) {
     const node = document.querySelector(selector);
     if (node) node.addEventListener("click", handler);
+  }
+
+  function bindSupportCalculators() {
+    document.querySelectorAll("[data-discount-calc], [data-installment-calc]").forEach((input) => {
+      input.addEventListener("input", handleSupportCalculatorChange);
+      input.addEventListener("change", handleSupportCalculatorChange);
+    });
+
+    document.querySelectorAll("[data-support-money]").forEach((input) => {
+      input.addEventListener("focus", handleSupportMoneyFocus);
+      input.addEventListener("blur", handleSupportMoneyBlur);
+    });
+  }
+
+  function handleSupportCalculatorChange(event) {
+    if (event.target.matches("[data-discount-calc]")) {
+      state.supportCalcTouched.discount = true;
+    }
+    if (event.target.matches("[data-installment-calc]")) {
+      state.supportCalcTouched.installments = true;
+    }
+    renderSupportCalculators(calculate());
+  }
+
+  function handleSupportMoneyFocus(event) {
+    const value = Math.round(readLooseNumber(event.target.value) || 0);
+    event.target.value = value ? String(value) : "";
+    event.target.select();
+  }
+
+  function handleSupportMoneyBlur(event) {
+    const raw = String(event.target.value || "").trim();
+    event.target.value = raw ? money(readLooseNumber(raw)) : "";
+    renderSupportCalculators(calculate());
+  }
+
+  function syncDiscountCalculatorFromProposal() {
+    const result = calculate();
+    state.supportCalcTouched.discount = false;
+    syncDiscountCalculatorDefaults(result);
+    renderSupportCalculators(result);
+    renderStatus("Calculadora de descuento actualizada con la propuesta.");
+  }
+
+  function syncInstallmentCalculatorFromProposal() {
+    const result = calculate();
+    state.supportCalcTouched.installments = false;
+    syncInstallmentCalculatorDefaults(result);
+    renderSupportCalculators(result);
+    renderStatus("Calculadora de cuotas actualizada con la propuesta.");
+  }
+
+  function applyDiscountCalculator() {
+    const calc = state.discountCalculator || calculateDiscountCalculator();
+    if (!calc.valid) {
+      renderStatus(calc.message || "Completa la calculadora de descuento antes de aplicar.", true);
+      return;
+    }
+
+    if (els.discountPct) els.discountPct.value = formatDecimalInput(calc.discountPct);
+    if (readPaymentMode() === "cash") {
+      syncCashPayment();
+    } else if (!state.paymentsManual) {
+      autoFillPayments();
+    }
+
+    state.supportCalcTouched.discount = false;
+    formatMoneyInputs();
+    render();
+    renderStatus(`Descuento aplicado: ${formatNumber(calc.discountPct)}%.`);
+  }
+
+  function applyInstallmentCalculator() {
+    const result = calculate();
+    const calc = state.installmentCalculator || calculateInstallmentCalculator(result);
+    if (!calc.valid) {
+      renderStatus(calc.message || "Completa la calculadora de cuotas antes de aplicar.", true);
+      return;
+    }
+    if (calc.balance > Math.round(result.net) + 1) {
+      renderStatus("El saldo a financiar no puede superar el valor total a pagar.", true);
+      return;
+    }
+
+    if (els.paymentMode) els.paymentMode.value = "financed";
+    if (els.initialPayment) els.initialPayment.value = money(Math.max(Math.round(result.net) - Math.round(calc.balance), 0));
+    if (els.installmentCount) els.installmentCount.value = calc.payments.length;
+    if (els.firstDueDate && calc.payments[0]) els.firstDueDate.value = calc.payments[0].date;
+
+    state.payments = calc.payments.map((item) => ({
+      amount: item.amount,
+      date: item.date
+    }));
+    state.paymentsManual = true;
+    state.supportCalcTouched.installments = false;
+    formatMoneyInputs();
+    render();
+    renderStatus("Cuotas aplicadas a la propuesta.");
   }
 
   function setPaymentMode(mode) {
@@ -251,6 +360,8 @@
       }
     });
     state.paymentsManual = false;
+    state.supportCalcTouched.discount = false;
+    state.supportCalcTouched.installments = false;
     applyPaymentMode(readPaymentMode(), { keepFinancedValues: true });
     renderStatus("Valores base restaurados.");
     render();
@@ -370,6 +481,7 @@
     if (!options || !options.skipPaymentEditor) renderPaymentEditor(result);
     renderBalanceCheck(result);
     renderErrors(result.errors);
+    renderSupportCalculators(result);
   }
 
   function setOutputs(values) {
@@ -521,6 +633,172 @@
     buttons.forEach((button) => {
       button.disabled = hasErrors;
     });
+  }
+
+  function renderSupportCalculators(result) {
+    if (!state.supportCalcTouched.discount) syncDiscountCalculatorDefaults(result);
+    if (!state.supportCalcTouched.installments) syncInstallmentCalculatorDefaults(result);
+    renderDiscountCalculator();
+    renderInstallmentCalculator(result);
+  }
+
+  function syncDiscountCalculatorDefaults(result) {
+    setSupportInput("[data-discount-calc='gross']", result.gross, true);
+    setSupportInput("[data-discount-calc='final']", result.net, true);
+  }
+
+  function syncInstallmentCalculatorDefaults(result) {
+    const balance = result.paymentMode === "financed" ? Math.max(result.balance, 0) : Math.max(result.net, 0);
+    const fallbackCount = result.installmentCount || Math.round(readNumber("installmentCount")) || 5;
+    const count = clamp(fallbackCount || 1, 1, MAX_INSTALLMENTS);
+    const firstDate = result.schedule[0] ? result.schedule[0].date : toISODate(result.firstDueDate || addMonths(today, 1));
+    const manualFirstAmount = state.paymentsManual && result.schedule.length > 1 ? result.schedule[0].amount : "";
+
+    setSupportInput("[data-installment-calc='balance']", balance, true);
+    setSupportInput("[data-installment-calc='count']", count, false);
+    setSupportInput("[data-installment-calc='firstAmount']", manualFirstAmount, true, true);
+    setSupportInput("[data-installment-calc='firstDate']", firstDate, false);
+  }
+
+  function renderDiscountCalculator() {
+    const node = document.querySelector("[data-discount-result]");
+    const button = document.querySelector("[data-action='applyDiscountCalculator']");
+    if (!node) return;
+
+    const calc = calculateDiscountCalculator();
+    state.discountCalculator = calc;
+    node.className = `calculator-result ${calc.valid ? "ok" : "warn"}`;
+    node.innerHTML = calc.valid
+      ? `<span>Descuento calculado</span><strong>${formatNumber(calc.discountPct)}%</strong><em>Ahorro para el cliente: ${money(calc.savings)}</em>`
+      : `<span>Revisa los valores</span><strong>${escapeHTML(calc.message)}</strong>`;
+    if (button) button.disabled = !calc.valid;
+  }
+
+  function calculateDiscountCalculator() {
+    const gross = readSupportNumber("[data-discount-calc='gross']");
+    const finalValue = readSupportNumber("[data-discount-calc='final']");
+
+    if (gross <= 0) {
+      return { valid: false, message: "Ingresa un valor bruto mayor a $0.", gross, finalValue };
+    }
+    if (finalValue < 0) {
+      return { valid: false, message: "El valor final no puede ser negativo.", gross, finalValue };
+    }
+    if (finalValue > gross) {
+      return { valid: false, message: "El valor final no puede superar el valor bruto.", gross, finalValue };
+    }
+
+    const savings = gross - finalValue;
+    const discountPct = (savings / gross) * 100;
+    return {
+      valid: true,
+      message: "",
+      gross,
+      finalValue,
+      savings,
+      discountPct
+    };
+  }
+
+  function renderInstallmentCalculator(result) {
+    const resultNode = document.querySelector("[data-installment-result]");
+    const previewNode = document.querySelector("[data-installment-preview]");
+    const button = document.querySelector("[data-action='applyInstallmentCalculator']");
+    if (!resultNode || !previewNode) return;
+
+    const calc = calculateInstallmentCalculator(result);
+    state.installmentCalculator = calc;
+    resultNode.className = `calculator-result ${calc.valid ? "ok" : "warn"}`;
+    resultNode.innerHTML = calc.valid
+      ? `<span>Simulacion lista</span><strong>${calc.count} ${calc.count === 1 ? "cuota" : "cuotas"} por ${money(calc.total)}</strong><em>Saldo pendiente: ${money(Math.abs(calc.difference))}</em>`
+      : `<span>Revisa los valores</span><strong>${escapeHTML(calc.message)}</strong>`;
+
+    previewNode.innerHTML = calc.payments.length
+      ? calc.payments
+          .map(
+            (item, index) => `
+              <div class="support-preview-row">
+                <strong>Cuota ${index + 1}</strong>
+                <span>${escapeHTML(formatCompactDate(parseISODate(item.date)))}</span>
+                <b>${money(item.amount)}</b>
+              </div>
+            `
+          )
+          .join("")
+      : `<div class="support-preview-empty">Completa los campos para ver la simulacion.</div>`;
+    if (button) button.disabled = !calc.valid;
+  }
+
+  function calculateInstallmentCalculator(result) {
+    const balance = Math.round(readSupportNumber("[data-installment-calc='balance']"));
+    const count = clamp(Math.floor(readSupportNumber("[data-installment-calc='count']") || 0), 0, MAX_INSTALLMENTS);
+    const firstAmountNode = document.querySelector("[data-installment-calc='firstAmount']");
+    const firstAmountRaw = firstAmountNode ? String(firstAmountNode.value || "").trim() : "";
+    const firstAmount = Math.round(readSupportNumber(firstAmountNode));
+    const hasFirstAmount = firstAmountRaw !== "" && firstAmount > 0;
+    const firstDateNode = document.querySelector("[data-installment-calc='firstDate']");
+    const firstDate = parseISODate(firstDateNode && firstDateNode.value) || result.firstDueDate || addMonths(today, 1);
+    const errors = [];
+
+    if (balance <= 0) errors.push("Ingresa un saldo a financiar mayor a $0.");
+    if (count < 1) errors.push("Ingresa minimo 1 cuota.");
+    if (count > MAX_INSTALLMENTS) errors.push(`El maximo permitido es ${MAX_INSTALLMENTS} cuotas.`);
+    if (hasFirstAmount && firstAmount >= balance && count > 1) {
+      errors.push("La cuota 1 debe ser menor al saldo si hay mas cuotas.");
+    }
+    if (hasFirstAmount && count === 1 && Math.abs(firstAmount - balance) > 1) {
+      errors.push("Con 1 cuota, la cuota 1 debe cubrir todo el saldo.");
+    }
+
+    let amounts = [];
+    if (errors.length === 0) {
+      if (hasFirstAmount) {
+        amounts = count === 1 ? [firstAmount] : [firstAmount].concat(distributeAmount(balance - firstAmount, count - 1));
+      } else {
+        amounts = distributeAmount(balance, count);
+      }
+    }
+
+    const payments = amounts.map((amount, index) => ({
+      amount,
+      date: toISODate(addMonths(firstDate, index))
+    }));
+    const total = payments.reduce((sum, item) => sum + item.amount, 0);
+    const difference = balance - total;
+    if (payments.some((item) => item.amount <= 0)) {
+      errors.push("Todas las cuotas calculadas deben ser mayores a $0.");
+    }
+    if (Math.abs(difference) > 1) {
+      errors.push("La simulacion no cierra en $0.");
+    }
+
+    return {
+      valid: errors.length === 0,
+      message: errors[0] || "",
+      balance,
+      count,
+      firstAmount,
+      hasFirstAmount,
+      firstDate,
+      payments,
+      total,
+      difference
+    };
+  }
+
+  function setSupportInput(selector, value, asMoney, allowEmpty) {
+    const node = document.querySelector(selector);
+    if (!node) return;
+    if (allowEmpty && (value === "" || value === null || value === undefined)) {
+      node.value = "";
+      return;
+    }
+    node.value = asMoney ? money(value) : String(value || "");
+  }
+
+  function readSupportNumber(selectorOrNode) {
+    const node = typeof selectorOrNode === "string" ? document.querySelector(selectorOrNode) : selectorOrNode;
+    return readLooseNumber(node ? node.value : "");
   }
 
   function autoFillPayments() {
@@ -749,6 +1027,11 @@
 
   function formatNumber(value) {
     return new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 }).format(Number(value) || 0);
+  }
+
+  function formatDecimalInput(value) {
+    const rounded = Math.round((Number(value) || 0) * 100) / 100;
+    return String(rounded).replace(/\.?0+$/, "");
   }
 
   function formatDate(date) {

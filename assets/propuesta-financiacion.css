@@ -482,6 +482,145 @@ textarea {
   background: var(--surface-muted);
 }
 
+.support-tools {
+  display: grid;
+  gap: 12px;
+}
+
+.support-tool {
+  border: 1px solid rgba(var(--brand-rgb), 0.16);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+}
+
+.support-tool-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.support-tool-header h3 {
+  margin: 0;
+  color: var(--brand-primary-dark);
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+
+.support-tool-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.text-btn {
+  flex: 0 0 auto;
+  border-radius: 7px;
+  padding: 6px 8px;
+  color: var(--brand-primary-dark);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.calculator-result {
+  display: grid;
+  gap: 3px;
+  margin-top: 10px;
+  border-radius: 7px;
+  padding: 10px 11px;
+}
+
+.calculator-result span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.calculator-result strong {
+  color: var(--brand-primary-dark);
+  font-size: 0.94rem;
+}
+
+.calculator-result em {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.calculator-result.ok {
+  border: 1px solid rgba(var(--brand-rgb), 0.16);
+  background: rgba(var(--brand-rgb), 0.07);
+}
+
+.calculator-result.warn {
+  border: 1px solid rgba(161, 92, 7, 0.24);
+  background: rgba(161, 92, 7, 0.08);
+}
+
+.calculator-result.warn strong {
+  color: var(--warning);
+}
+
+.support-preview {
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.support-preview-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 9px;
+  background: var(--surface-muted);
+}
+
+.support-preview-row strong {
+  color: var(--brand-primary-dark);
+  font-size: 0.84rem;
+}
+
+.support-preview-row span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.support-preview-row b {
+  color: var(--ink);
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+.support-preview-empty {
+  border: 1px dashed #c8d5cc;
+  border-radius: 8px;
+  padding: 11px;
+  color: var(--muted);
+  background: var(--surface-muted);
+  font-size: 0.84rem;
+}
+
+.support-action {
+  width: 100%;
+  margin-top: 10px;
+  min-height: 38px;
+  padding: 9px 11px;
+  font-size: 0.84rem;
+}
+
 .icon-btn {
   grid-area: remove;
   min-width: 66px;
@@ -1055,6 +1194,22 @@ textarea {
       "amount"
       "date"
       "remove";
+  }
+
+  .support-tool-header {
+    display: grid;
+  }
+
+  .text-btn {
+    width: 100%;
+  }
+
+  .support-preview-row {
+    grid-template-columns: 1fr;
+  }
+
+  .support-preview-row b {
+    text-align: left;
   }
 
   .icon-btn {
