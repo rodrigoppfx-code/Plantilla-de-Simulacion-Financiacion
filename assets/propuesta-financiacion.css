@@ -310,6 +310,57 @@ textarea {
   font-weight: 850;
 }
 
+.price-reference {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(var(--brand-rgb), 0.18);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface-muted);
+}
+
+.price-reference strong,
+.price-reference span {
+  display: block;
+}
+
+.price-reference strong {
+  color: var(--brand-primary-dark);
+  font-size: 0.93rem;
+  line-height: 1.2;
+}
+
+.price-reference span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.reference-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid rgba(var(--brand-rgb), 0.22);
+  border-radius: 7px;
+  padding: 8px 11px;
+  color: var(--brand-primary-dark);
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 850;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+}
+
+.reference-link:hover {
+  background: var(--brand-soft);
+}
+
 .payment-mode {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1181,6 +1232,14 @@ textarea {
   .summary-grid,
   .actions {
     grid-template-columns: 1fr;
+  }
+
+  .price-reference {
+    display: grid;
+  }
+
+  .reference-link {
+    width: 100%;
   }
 
   .actions .ghost-btn {

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plantilla de Simulacion Financiacion</title>
-  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=math-fixes-1">
+  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=discount-sheet-link-1">
   <script>
     window.FINANCING_APP_CONFIG = {
       logoUrl: "assets/logo-avovite.png",
@@ -30,7 +30,7 @@
   </script>
   <script defer src="assets/vendor/html2canvas.min.js"></script>
   <script defer src="assets/vendor/jspdf.umd.min.js"></script>
-  <script defer src="assets/propuesta-financiacion.js?v=math-fixes-1"></script>
+  <script defer src="assets/propuesta-financiacion.js?v=discount-sheet-link-1"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -88,6 +88,17 @@
               <label for="clientEmail">Correo</label>
               <input id="clientEmail" data-field="clientEmail" type="email" placeholder="Opcional">
             </div>
+          </div>
+
+          <div class="section-title">Precios vigentes</div>
+          <div class="price-reference">
+            <div>
+              <strong>Descuentos actuales</strong>
+              <span>Consulta la tabla vigente antes de ingresar valores o porcentajes.</span>
+            </div>
+            <a class="reference-link" href="https://docs.google.com/spreadsheets/d/1NQAaQYk8EM2e_kf9TF_ZhFHSCBQr3bdb/edit?gid=1950491821#gid=1950491821" target="_blank" rel="noopener noreferrer">
+              Abrir tabla
+            </a>
           </div>
 
           <div class="section-title">Valores</div>

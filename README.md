@@ -6,13 +6,14 @@ Herramienta web estatica para generar propuestas comerciales de Avovite con desc
 
 1. Abre la pagina publicada en GitHub Pages.
 2. Ingresa asesor/a y datos del cliente.
-3. Ajusta cantidad de Vites, valor unitario y porcentaje de descuento.
-4. Elige `Pagar de contado` o `Financiado`.
-5. Si eliges financiado, ingresa abono inicial y revisa las cuotas.
-6. Usa `Autorrellenar cuotas iguales` o edita las cuotas manualmente.
-7. Si necesitas apoyo, usa las calculadoras internas para encontrar el porcentaje de descuento o simular cuotas antes de aplicar los cambios.
-8. Verifica que el contador cierre en `$0`.
-9. Descarga la propuesta en PDF o imagen.
+3. Abre `Descuentos actuales` si necesitas consultar la tabla vigente de precios y descuentos.
+4. Ajusta cantidad de Vites, valor unitario y porcentaje de descuento.
+5. Elige `Pagar de contado` o `Financiado`.
+6. Si eliges financiado, ingresa abono inicial y revisa las cuotas.
+7. Usa `Autorrellenar cuotas iguales` o edita las cuotas manualmente.
+8. Si necesitas apoyo, usa las calculadoras internas para encontrar el porcentaje de descuento o simular cuotas antes de aplicar los cambios.
+9. Verifica que el contador cierre en `$0`.
+10. Descarga la propuesta en PDF o imagen.
 
 ## Publicacion en GitHub Pages
 
