@@ -508,9 +508,6 @@ input[type=checkbox]{accent-color:#1F4D2B}
         <div style="font-size:13px;color:#5F6B62">{{ linkMsg }}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
           <button onClick="{{ doCopy }}" style="height:44px;border:0;border-radius:12px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Copiar</button>
-          <sc-if value="{{ canShare }}" hint-placeholder-val="{{ false }}">
-            <button onClick="{{ doShare }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer">Compartir…</button>
-          </sc-if>
           <button onClick="{{ doOpen }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer">Abrir</button>
         </div>
       </div>
@@ -832,9 +829,7 @@ class Component extends DCLogic {
       copyLink: () => { if (!this.guard()) return; this.showLink(this.linkFor(c), 'Link de la propuesta'); },
       hasLink: !!this.state.link, linkUrl: this.state.link?.url || '', linkTitle: this.state.link?.title || '', linkMsg: this.state.link?.msg || '',
       closeLink: () => this.setState({ link: null }), stop: e => e.stopPropagation(), selectAll: e => e.target.select(),
-      canShare: !!navigator.share,
       doCopy: async () => { const ok = await this.copyText(this.state.link.url); this.setState(s => ({ link: { ...s.link, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'No se pudo copiar automáticamente: mantén presionado el link y elige Copiar.' } })); },
-      doShare: () => { const l = this.state.link; navigator.share({ title: 'Propuesta Avovite', url: l.url }).catch(() => {}); },
       doOpen: () => window.open(this.state.link.url, '_blank'),
       openClient: () => window.open(this.linkFor(c), '_blank'),
       resetAll: () => { this.touched = false; this.ov = {}; this.setState({ f: this.newF(cfg) }); },
