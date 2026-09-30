@@ -1,344 +1,853 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Plantilla de Simulacion Financiacion</title>
-  <link rel="stylesheet" href="assets/propuesta-financiacion.css?v=discount-sheet-link-1">
-  <script>
-    window.FINANCING_APP_CONFIG = {
-      logoUrl: "assets/logo-avovite.png",
-      primaryColor: "#1f6b34",
-      accentColor: "#a75b2b",
-      defaults: {
-        companyName: "AVOVITE S.A.S.",
-        companyNit: "901446849-9",
-        advisorName: "",
-        clientName: "",
-        clientPhone: "",
-        clientEmail: "",
-        productName: "Vites",
-        quantity: 1,
-        unitPrice: 2580000,
-        discountPct: 22,
-        initialPayment: 2012400,
-        installmentCount: 0,
-        paymentMode: "cash",
-        notes: "Propuesta v\u00e1lida \u00fanicamente por el d\u00eda de hoy. Los valores quedan sujetos a confirmaci\u00f3n de pago y disponibilidad."
-      }
-    };
-  </script>
-  <script defer src="assets/vendor/html2canvas.min.js"></script>
-  <script defer src="assets/vendor/jspdf.umd.min.js"></script>
-  <script defer src="assets/propuesta-financiacion.js?v=discount-sheet-link-1"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-lockup">
-        <div class="brand-mark" data-logo></div>
-        <div class="brand-text">
-          <h1>Plantilla de Simulacion Financiacion</h1>
-          <p>Calcula descuentos, financiaci&oacute;n y calendario de pagos en una propuesta lista para enviar.</p>
-        </div>
+<x-dc>
+<helmet>
+<title>Propuestas comerciales · Avovite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+body{margin:0;background:#F4F2EB;font-family:Figtree,system-ui,sans-serif;color:#17231A;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#1F4D2B}a:hover{color:#2E6B3A}
+input,select,button{font-family:inherit}
+input[type=range]{accent-color:#1F4D2B}
+input[type=checkbox]{accent-color:#1F4D2B}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+  <header style="position:sticky;top:0;z-index:20;background:rgba(244,242,235,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #E1E3DA">
+    <div style="max-width:1440px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="assets/logo.png" alt="Avovite" style="height:36px;width:auto;display:block">
+        <div style="width:1px;height:24px;background:#D6D9CF"></div>
+        <div style="font-size:14px;font-weight:600;color:#3F4B42;letter-spacing:0.01em">Propuestas comerciales</div>
       </div>
-      <div class="today-pill">Valida solo hoy: <span data-out="todayLong"></span></div>
-    </header>
+      <sc-if value="{{ notCliente }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:flex;flex-wrap:wrap;gap:4px;background:#E9EBE2;padding:4px;border-radius:12px">
+          <button onClick="{{ goAsesora }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabA.bg }};color:{{ tabA.fg }};box-shadow:{{ tabA.sh }}">Nueva propuesta</button>
+          <button onClick="{{ goPrecios }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabP.bg }};color:{{ tabP.fg }};box-shadow:{{ tabP.sh }}">Precios actuales</button>
+          <button onClick="{{ goAdmin }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabB.bg }};color:{{ tabB.fg }};box-shadow:{{ tabB.sh }}">Administrador</button>
+        </nav>
+      </sc-if>
+      <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ dlPdf }}" style="border:0;cursor:pointer;height:40px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;background:#1F4D2B;color:#fff" style-hover="background:#16361F">Descargar PDF</button>
+          <button onClick="{{ dlImg }}" style="border:1px solid #CBD1C4;cursor:pointer;height:40px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;background:#fff;color:#1F4D2B" style-hover="background:#EEF3EA">Descargar imagen</button>
+        </div>
+      </sc-if>
+    </div>
+  </header>
 
-    <main class="workspace">
-      <aside class="panel form-panel">
-        <div class="panel-header">
-          <h2>Datos de la propuesta</h2>
-          <p>Completa los campos principales y revisa la propuesta generada en tiempo real.</p>
+  <main style="flex:1;width:100%;max-width:1440px;margin:0 auto;padding:24px;display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;justify-content:center">
+
+    <!-- ===== FORMULARIO ASESORA ===== -->
+    <sc-if value="{{ isAsesora }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Formulario asesora" style="flex:1 1 360px;max-width:460px;display:flex;flex-direction:column;gap:16px">
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">1</span><span style="font-size:15px;font-weight:700">Cliente</span></div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Nombre completo
+            <input value="{{ f.nombre }}" onChange="{{ on.nombre }}" placeholder="Nombre del cliente" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
+          </label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Celular
+              <input value="{{ f.cel }}" onChange="{{ on.cel }}" inputMode="tel" placeholder="300 000 0000" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Correo
+              <input value="{{ f.mail }}" onChange="{{ on.mail }}" type="email" placeholder="correo@ejemplo.com" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
+            </label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Asesora
+            <select value="{{ f.asesora }}" onChange="{{ on.asesora }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none">
+              <sc-for list="{{ asesoras }}" as="a" hint-placeholder-count="2"><option value="{{ a }}">{{ a }}</option></sc-for>
+            </select>
+          </label>
         </div>
 
-        <div class="form-body">
-          <input id="companyName" data-field="companyName" type="hidden">
-          <input id="companyNit" data-field="companyNit" type="hidden">
-          <input data-field="productName" type="hidden">
-          <input id="paymentMode" data-field="paymentMode" type="hidden">
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">2</span><span style="font-size:15px;font-weight:700">Vites y descuento</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;border:1px solid #D6DBD0;border-radius:12px;overflow:hidden">
+              <button onClick="{{ qMinus }}" style="width:48px;height:48px;border:0;background:#F4F6F1;font-size:22px;color:#1F4D2B;cursor:pointer" style-hover="background:#E9EEE4">−</button>
+              <input value="{{ f.q }}" onChange="{{ on.q }}" inputMode="numeric" style="width:64px;height:48px;border:0;text-align:center;font-size:20px;font-weight:700;color:#17231A;outline:none">
+              <button onClick="{{ qPlus }}" style="width:48px;height:48px;border:0;background:#F4F6F1;font-size:22px;color:#1F4D2B;cursor:pointer" style-hover="background:#E9EEE4">+</button>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:600;color:#6A756C;text-transform:uppercase;letter-spacing:0.06em">Categoría</div>
+              <div style="font-family:Newsreader,serif;font-size:22px;font-weight:500;color:#1F4D2B">{{ p.tierName }}</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;color:#4A564D;padding:10px 12px;background:#F6F7F3;border-radius:10px"><span>{{ p.q }} × {{ p.unitStr }}</span><span style="font-weight:700;color:#17231A">{{ p.subStr }}</span></div>
 
-          <div class="company-fixed">
-            <div class="company-fixed-logo" data-logo></div>
-            <div>
-              <strong>AVOVITE S.A.S.</strong>
-              <span>NIT: 901446849-9</span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Descuento de compra</span><span style="font-size:12px;color:#6A756C">Máximo {{ p.tierMax }}% para {{ p.tierName }}</span></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="range" min="0" max="{{ p.tierMax }}" step="1" value="{{ p.d }}" onChange="{{ on.d }}" style="flex:1;height:28px">
+              <div style="display:flex;align-items:center;border:1px solid #D6DBD0;border-radius:10px;height:44px;padding:0 10px;gap:2px;width:80px"><input value="{{ p.d }}" onChange="{{ on.d }}" inputMode="numeric" style="width:100%;border:0;font-size:16px;font-weight:700;text-align:right;outline:none;color:#17231A"><span style="font-weight:600;color:#6A756C">%</span></div>
             </div>
           </div>
 
-          <div class="section-title">Asesor/a</div>
-          <div class="field-grid">
-            <div class="field full">
-              <label for="advisorName">Nombre del asesor/a</label>
-              <input id="advisorName" data-field="advisorName" type="text" placeholder="Nombre de asesor/a">
-            </div>
-          </div>
-
-          <div class="section-title">Cliente</div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="clientName">Nombre del cliente *</label>
-              <input id="clientName" data-field="clientName" type="text" placeholder="Ej. Jefferson Salguero" required>
-            </div>
-            <div class="field">
-              <label for="clientPhone">Tel&eacute;fono</label>
-              <input id="clientPhone" data-field="clientPhone" type="text" placeholder="Opcional">
-            </div>
-            <div class="field full">
-              <label for="clientEmail">Correo</label>
-              <input id="clientEmail" data-field="clientEmail" type="email" placeholder="Opcional">
-            </div>
-          </div>
-
-          <div class="section-title">Precios vigentes</div>
-          <div class="price-reference">
-            <div>
-              <strong>Descuentos actuales</strong>
-              <span>Consulta la tabla vigente antes de ingresar valores o porcentajes.</span>
-            </div>
-            <a class="reference-link" href="https://docs.google.com/spreadsheets/d/1NQAaQYk8EM2e_kf9TF_ZhFHSCBQr3bdb/edit?gid=1950491821#gid=1950491821" target="_blank" rel="noopener noreferrer">
-              Abrir tabla
-            </a>
-          </div>
-
-          <div class="section-title">Valores</div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="quantity">Cantidad de Vites</label>
-              <input id="quantity" data-field="quantity" type="number" min="1" step="1">
-            </div>
-            <div class="field">
-              <label for="unitPrice">Valor unitario por Vite</label>
-              <input id="unitPrice" data-field="unitPrice" type="text" inputmode="numeric" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="discountPct">Porcentaje de descuento</label>
-              <input id="discountPct" data-field="discountPct" type="number" min="0" max="100" step="0.01">
-            </div>
-            <div class="field">
-              <label for="totalPayable">Valor total a pagar</label>
-              <input id="totalPayable" data-total-payable type="text" readonly>
-            </div>
-          </div>
-
-          <div class="section-title">Forma de pago</div>
-          <div class="payment-mode" data-payment-mode-selector>
-            <button class="mode-card" type="button" data-payment-mode-option="cash">
-              <strong><span class="mode-check">✓</span> Pagar de contado</strong>
-              <span>Rellena el valor total a pagar y deja la propuesta sin cuotas.</span>
-            </button>
-            <button class="mode-card" type="button" data-payment-mode-option="financed">
-              <strong><span class="mode-check">✓</span> Financiado</strong>
-              <span>Permite abono inicial y cuotas editables.</span>
-            </button>
-          </div>
-
-          <div class="cash-note" data-cash-section>
-            Pago de contado seleccionado: el abono cubre el valor total a pagar.
-          </div>
-
-          <div data-financed-section>
-          <div class="section-title">Abono inicial</div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="initialPayment">Abono inicial</label>
-              <input id="initialPayment" data-field="initialPayment" type="text" inputmode="numeric" autocomplete="off">
-            </div>
-            <div class="field">
-              <label for="initialPaymentDate">Fecha abono inicial</label>
-              <input id="initialPaymentDate" data-field="initialPaymentDate" type="date">
-            </div>
-          </div>
-
-          <div class="section-title">Cuotas</div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="installmentCount">N&uacute;mero de cuotas</label>
-              <input id="installmentCount" data-field="installmentCount" type="number" min="0" max="11" step="1">
-            </div>
-            <div class="field">
-              <label for="firstDueDate">Fecha primera cuota</label>
-              <input id="firstDueDate" data-field="firstDueDate" type="date">
-            </div>
-          </div>
-
-          <div class="payment-tools">
-            <button class="ghost-btn" type="button" data-action="autoPayments">Autorrellenar cuotas iguales</button>
-            <button class="ghost-btn" type="button" data-action="addPayment">Agregar cuota</button>
-          </div>
-
-          <div class="balance-check" data-balance-check></div>
-          <div class="payment-editor" data-payment-editor></div>
-          </div>
-
-          <div class="section-title">Calculadoras de apoyo</div>
-          <div class="support-tools" aria-label="Calculadoras de apoyo para asesoras">
-            <section class="support-tool">
-              <div class="support-tool-header">
-                <div>
-                  <h3>Calcular descuento</h3>
-                  <p>Usa el valor bruto y el valor final ofrecido para encontrar el porcentaje exacto.</p>
-                </div>
-                <button class="text-btn" type="button" data-action="syncDiscountCalculator">Usar datos actuales</button>
+          <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1px dashed #C9CFBF;border-radius:12px;cursor:pointer;font-size:14px;font-weight:600;color:#2F3A32">
+            <input type="checkbox" checked="{{ f.auth }}" onChange="{{ on.auth }}" style="width:20px;height:20px">
+            Autorizo un descuento adicional
+          </label>
+          <sc-if value="{{ f.auth }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px;padding:0 4px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Descuento adicional</span><span style="font-size:12px;color:#6A756C">Hasta {{ p.xMax }}% (tope total {{ cfg.topeTotal }}%)</span></div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <input type="range" min="0" max="{{ p.xMax }}" step="1" value="{{ p.x }}" onChange="{{ on.x }}" style="flex:1;height:28px">
+                <div style="display:flex;align-items:center;border:1px solid #D6DBD0;border-radius:10px;height:44px;padding:0 10px;gap:2px;width:80px"><input value="{{ p.x }}" onChange="{{ on.x }}" inputMode="numeric" style="width:100%;border:0;font-size:16px;font-weight:700;text-align:right;outline:none;color:#17231A"><span style="font-weight:600;color:#6A756C">%</span></div>
               </div>
-              <div class="field-grid">
-                <div class="field">
-                  <label for="discountCalcGross">Valor bruto</label>
-                  <input id="discountCalcGross" data-discount-calc="gross" data-support-money type="text" inputmode="numeric" autocomplete="off">
-                </div>
-                <div class="field">
-                  <label for="discountCalcFinal">Valor final para cliente</label>
-                  <input id="discountCalcFinal" data-discount-calc="final" data-support-money type="text" inputmode="numeric" autocomplete="off">
-                </div>
-              </div>
-              <div class="calculator-result" data-discount-result></div>
-              <button class="secondary-btn support-action" type="button" data-action="applyDiscountCalculator">Aplicar descuento a la propuesta</button>
-            </section>
-
-            <section class="support-tool">
-              <div class="support-tool-header">
-                <div>
-                  <h3>Calcular cuotas</h3>
-                  <p>Sirve para simular una primera cuota diferente y repartir el saldo restante en cuotas iguales.</p>
-                </div>
-                <button class="text-btn" type="button" data-action="syncInstallmentCalculator">Usar datos actuales</button>
-              </div>
-              <div class="field-grid">
-                <div class="field">
-                  <label for="installmentCalcBalance">Saldo a financiar</label>
-                  <input id="installmentCalcBalance" data-installment-calc="balance" data-support-money type="text" inputmode="numeric" autocomplete="off">
-                </div>
-                <div class="field">
-                  <label for="installmentCalcCount">N&uacute;mero total de cuotas</label>
-                  <input id="installmentCalcCount" data-installment-calc="count" type="number" min="1" max="11" step="1">
-                </div>
-                <div class="field">
-                  <label for="installmentCalcFirstAmount">Valor cuota 1 opcional</label>
-                  <input id="installmentCalcFirstAmount" data-installment-calc="firstAmount" data-support-money type="text" inputmode="numeric" autocomplete="off" placeholder="Si queda vacio, divide todo igual">
-                </div>
-                <div class="field">
-                  <label for="installmentCalcFirstDate">Fecha cuota 1</label>
-                  <input id="installmentCalcFirstDate" data-installment-calc="firstDate" type="date">
-                </div>
-              </div>
-              <div class="calculator-result" data-installment-result></div>
-              <div class="support-preview" data-installment-preview></div>
-              <button class="secondary-btn support-action" type="button" data-action="applyInstallmentCalculator">Aplicar cuotas a la propuesta</button>
-            </section>
-          </div>
-
-          <div class="section-title">Nota</div>
-          <div class="field-grid">
-            <div class="field full">
-              <label for="notes">Nota de validez</label>
-              <textarea id="notes" data-field="notes"></textarea>
+              <div style="font-size:12px;color:#6A756C">Aparece en la propuesta como “Beneficio adicional autorizado”.</div>
             </div>
-          </div>
-
-          <div class="error-panel" data-errors></div>
-
-          <div class="actions">
-            <button class="primary-btn" type="button" data-action="downloadPdf" data-requires-valid>Descargar PDF</button>
-            <button class="secondary-btn" type="button" data-action="downloadImage" data-requires-valid>Descargar imagen</button>
-            <button class="ghost-btn" type="button" data-action="reset">Restaurar</button>
-          </div>
-          <div class="status-line" data-status></div>
-        </div>
-      </aside>
-
-      <section class="preview-wrap">
-        <div class="panel proposal-toolbar">
-          <strong>Vista previa para el cliente</strong>
+          </sc-if>
         </div>
 
-        <div class="proposal">
-          <article class="proposal-document" id="proposalDocument">
-            <section class="proposal-hero">
-              <div class="proposal-title">
-                <h2>Propuesta comercial</h2>
-                <p>Opci&oacute;n para avanzar hoy con tus Vites.</p>
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">3</span><span style="font-size:15px;font-weight:700">Forma de pago</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#EEF0E9;padding:4px;border-radius:12px">
+            <button onClick="{{ setContado }}" style="border:0;cursor:pointer;height:40px;border-radius:9px;font-size:14px;font-weight:600;background:{{ segC.bg }};color:{{ segC.fg }};box-shadow:{{ segC.sh }}">De contado</button>
+            <button onClick="{{ setFin }}" style="border:0;cursor:pointer;height:40px;border-radius:9px;font-size:14px;font-weight:600;background:{{ segF.bg }};color:{{ segF.fg }};box-shadow:{{ segF.sh }}">Financiado</button>
+          </div>
+          <sc-if value="{{ p.fin }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Abono inicial (hoy)
+                  <input value="{{ p.abonoIn }}" onChange="{{ on.abono }}" inputMode="numeric" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:600;color:#17231A;background:#fff;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Primera cuota
+                  <input type="date" value="{{ f.first }}" onChange="{{ on.first }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none">
+                </label>
               </div>
-              <div class="proposal-logo-box" data-logo></div>
-            </section>
-
-            <div class="validity-band">
-              <span>Propuesta &uacute;nicamente v&aacute;lida hasta hoy</span>
-              <span data-out="validUntil"></span>
-            </div>
-
-            <section class="proposal-body">
-              <div class="client-line">
-                <div>
-                  <p>Datos del cliente</p>
-                  <h3 data-out="clientName"></h3>
-                  <div class="client-contact" data-client-contact></div>
-                </div>
-                <div class="meta">
-                  <p><strong data-out="companyName"></strong></p>
-                  <p>NIT: <span data-out="companyNit"></span></p>
-                  <p>Asesor/a: <span data-out="advisorName"></span></p>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:13px;font-weight:600;color:#4A564D">Número de cuotas <span style="font-weight:400;color:#6A756C">(sin intereses, máx. {{ cfg.maxCuotas }})</span></span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ nOpts }}" as="o" hint-placeholder-count="8">
+                    <button onClick="{{ o.pick }}" style="width:44px;height:44px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:700;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.n }}</button>
+                  </sc-for>
                 </div>
               </div>
-
-              <div class="summary-grid">
-                <div class="metric">
-                  <span>Cantidad de Vites</span>
-                  <strong data-out="quantity"></strong>
-                </div>
-                <div class="metric">
-                  <span>Valor unitario</span>
-                  <strong data-out="unitPrice"></strong>
-                </div>
-                <div class="metric">
-                  <span>Valor total</span>
-                  <strong data-out="gross"></strong>
-                </div>
-                <div class="metric">
-                  <span>Descuento</span>
-                  <strong data-out="discountPct"></strong>
-                </div>
-              </div>
-
-              <div class="savings-callout">
-                <div>
-                  <p>Valor neto a pagar</p>
-                  <strong data-out="net"></strong>
-                </div>
-                <div>
-                  <p>Te ganas con tu descuento</p>
-                  <strong data-out="discountAmount"></strong>
-                </div>
-              </div>
-
-              <div class="payment-section">
-                <div class="payment-box">
-                  <h4>Resumen del plan</h4>
-                  <div class="payment-highlight">
-                    <span>Abono inicial / contado</span>
-                    <strong data-out="initialPayment"></strong>
-                    <span class="payment-date">Pago: <span data-out="initialPaymentDateCompact"></span></span>
+              <div style="display:flex;justify-content:space-between;font-size:14px;color:#4A564D;padding:10px 12px;background:#F6F7F3;border-radius:10px"><span>Saldo a financiar</span><span style="font-weight:700;color:#17231A">{{ p.saldoStr }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Cuotas</span><button onClick="{{ resetCuotas }}" style="border:0;background:none;color:#1F4D2B;font-size:12px;font-weight:600;cursor:pointer;padding:4px 0">Repartir en partes iguales</button></div>
+                <sc-for list="{{ cuotaEd }}" as="c" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center">
+                    <span style="font-size:13px;font-weight:700;color:#6A756C">{{ c.n }}</span>
+                    <input value="{{ c.vStr }}" onChange="{{ c.onV }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;font-weight:600;color:#17231A;width:100%;outline:none">
+                    <input type="date" value="{{ c.d }}" onChange="{{ c.onD }}" style="height:40px;padding:0 8px;border:1px solid #D6DBD0;border-radius:9px;font-size:13px;color:#17231A;width:100%;outline:none">
                   </div>
-                  <div class="payment-highlight">
-                    <span>Saldo financiado</span>
-                    <strong data-out="balance"></strong>
-                    <span>A <span data-out="installmentLabel"></span></span>
-                  </div>
-                </div>
-
-                <div class="payment-box">
-                  <h4>Fechas de pago</h4>
-                  <div class="schedule" data-schedule></div>
-                </div>
+                </sc-for>
+                <sc-if value="{{ p.hasDiff }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px;font-weight:600;color:#8A4B12;background:#FBF1E4;border-radius:9px;padding:10px 12px">{{ p.diffMsg }}</div>
+                </sc-if>
               </div>
-            </section>
+            </div>
+          </sc-if>
+        </div>
 
-            <footer class="proposal-footer">
-              <p data-out="notes"></p>
-            </footer>
-          </article>
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">4</span><span style="font-size:15px;font-weight:700">Enviar al cliente</span></div>
+          <button onClick="{{ dlPdf }}" style="height:48px;border:0;border-radius:12px;background:#1F4D2B;color:#fff;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#16361F">{{ busyPdf }}</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button onClick="{{ dlImg }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">{{ busyImg }}</button>
+            <button onClick="{{ copyLink }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Copiar link</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:8px;padding-top:4px">
+            <button onClick="{{ openClient }}" style="border:0;background:none;color:#4A564D;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Ver como cliente</button>
+            <button onClick="{{ resetAll }}" style="border:0;background:none;color:#4A564D;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Nueva propuesta</button>
+          </div>
         </div>
       </section>
-    </main>
-  </div>
+    </sc-if>
+
+    <!-- ===== PROPUESTA (vista cliente / PDF / imagen) ===== -->
+    <sc-if value="{{ showProposal }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Propuesta" style="flex:1 1 560px;max-width:840px;min-width:0;display:flex;flex-direction:column;gap:12px">
+        <sc-if value="{{ p.expired }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FBF1E4;color:#7A4210;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600">Esta propuesta era válida hasta el {{ p.dateLong }}. Contacta a tu asesora para actualizarla.</div>
+        </sc-if>
+
+        <article ref="{{ propRef }}" style="background:#FBF8F0;border-radius:4px;box-shadow:0 1px 2px rgba(23,35,26,0.06),0 12px 40px rgba(23,35,26,0.08);width:100%;color:#17231A;font-family:Figtree,system-ui,sans-serif">
+
+          <div style="padding:36px 40px 22px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+            <img src="assets/logo.png" alt="Avovite" style="height:64px;width:auto;display:block">
+            <div style="text-align:right;display:flex;flex-direction:column;gap:3px">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:#9A7B34;text-transform:uppercase">Propuesta comercial</div>
+              <div style="font-size:14px;font-weight:700;color:#16361F">{{ cfg.empresa }}</div>
+              <div style="font-size:13px;color:#5F6B62">NIT {{ cfg.nit }}</div>
+              <div style="font-size:13px;color:#5F6B62">Asesora: <strong style="color:#17231A">{{ p.asesora }}</strong></div>
+            </div>
+          </div>
+          <div style="margin:0 40px;display:flex;height:2px"><div style="width:64px;background:#B08D3C"></div><div style="flex:1;height:1px;background:#E4DECC"></div></div>
+
+          <div style="margin:18px 40px 0;display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#F2ECDC;border-radius:10px">
+            <span style="width:8px;height:8px;margin-top:6px;border-radius:50%;background:#B08D3C;flex:none"></span>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="font-size:13px;font-weight:700;color:#16361F">Válida únicamente hoy · {{ p.dateLong }}</div>
+              <div style="font-size:12px;color:#5F6B62;line-height:1.45">{{ p.nota }}</div>
+            </div>
+          </div>
+
+          <div style="padding:26px 40px 20px;display:flex;flex-direction:column;gap:6px;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#6A756C;letter-spacing:0.04em">Preparada para</div>
+            <div style="font-family:Newsreader,serif;font-size:36px;line-height:1.1;font-weight:500;color:#16361F;text-wrap:balance">{{ p.nombre }}</div>
+            <div style="font-size:14px;color:#5F6B62">{{ p.contact }}</div>
+          </div>
+
+          <div style="margin:0 40px;background:#16361F;color:#fff;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+            <div style="padding:26px 28px;display:flex;flex-direction:column;gap:18px">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;color:#BFD3BF;text-transform:uppercase">Tu categoría</div>
+                <div style="font-family:Newsreader,serif;font-size:34px;font-weight:500;line-height:1.1">{{ p.tierName }}</div>
+                <div style="font-size:13px;color:#BFD3BF">{{ p.tierRange }} Vites · descuento hasta {{ p.tierMax }}%</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid #2F5237">
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#D5E2D3">{{ p.q }} {{ p.vitesWord }} × {{ p.unitStr }}</span><span style="font-weight:600">{{ p.subStr }}</span></div>
+                <sc-if value="{{ p.hasD }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#D5E2D3">Descuento {{ p.tierName }} ({{ p.d }}%)</span><span style="font-weight:600;color:#E7D9A8">−{{ p.dvStr }}</span></div>
+                </sc-if>
+                <sc-if value="{{ p.hasX }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span style="color:#D5E2D3">Beneficio adicional autorizado ({{ p.x }}%)</span><span style="font-weight:600;color:#E7D9A8">−{{ p.xvStr }}</span></div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="padding:26px 28px;background:#1F4D2B;display:flex;flex-direction:column;justify-content:center;gap:12px">
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;color:#BFD3BF;text-transform:uppercase">Total a pagar</div>
+              <div style="font-family:Newsreader,serif;font-size:46px;font-weight:500;line-height:1;letter-spacing:-0.01em">{{ p.totalStr }}</div>
+              <sc-if value="{{ p.hasSave }}" hint-placeholder-val="{{ true }}">
+                <div style="align-self:flex-start;display:flex;flex-direction:column;gap:2px;padding:10px 14px;background:#E7D9A8;color:#16361F;border-radius:10px">
+                  <span style="font-size:12px;font-weight:600">Te ganas con tu descuento</span>
+                  <span style="font-size:18px;font-weight:700">{{ p.saveStr }} · {{ p.totPct }}%</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="padding:30px 40px 8px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+              <div style="font-family:Newsreader,serif;font-size:22px;font-weight:500;color:#16361F">Plan de pagos</div>
+              <div style="font-size:13px;color:#5F6B62">{{ p.planNote }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;border:1px solid #E4DECC;border-radius:12px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 140px;gap:12px;padding:10px 18px;background:#F2ECDC;font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6A756C;text-transform:uppercase">
+                <span>Concepto</span><span>Fecha</span><span style="text-align:right">Valor</span>
+              </div>
+              <sc-for list="{{ p.pay }}" as="r" hint-placeholder-count="2">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 140px;gap:12px;padding:12px 18px;border-top:1px solid #ECE6D6;font-size:14px;align-items:center">
+                  <span style="font-weight:600;color:#17231A">{{ r.label }}</span>
+                  <span style="color:#5F6B62">{{ r.date }}</span>
+                  <span style="font-weight:700;color:#17231A;text-align:right;font-variant-numeric:tabular-nums">{{ r.amount }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ p.fin }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 140px;gap:12px;padding:12px 18px;border-top:1px solid #E4DECC;background:#F6F1E4;font-size:14px;align-items:center">
+                  <span style="font-weight:700;color:#16361F">Total</span><span></span>
+                  <span style="font-weight:700;color:#16361F;text-align:right;font-variant-numeric:tabular-nums">{{ p.totalStr }}</span>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ p.fin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#E8EEDD;border-radius:10px">
+                <svg width="22" height="22" viewBox="0 0 18 18" fill="none" style="flex:none"><circle cx="9" cy="9" r="9" fill="#1F4D2B"></circle><path d="M5.2 9.3l2.4 2.4 5-5.2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <div style="display:flex;flex-direction:column;gap:1px">
+                  <span style="font-size:14px;font-weight:700;color:#16361F">Beneficio adicional: plan de pagos sin intereses</span>
+                  <span style="font-size:12px;color:#4A564D">{{ p.finNote }}</span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="padding:26px 40px 36px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:Newsreader,serif;font-size:22px;font-weight:500;color:#16361F">Beneficios de tu categoría</div>
+            <div data-scroll="1" style="overflow-x:auto;border:1px solid #E4DECC;border-radius:12px">
+              <div style="min-width:620px;display:grid;grid-template-columns:minmax(200px,1.8fr) repeat(4,minmax(96px,1fr))">
+                <div style="padding:12px 16px;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#6A756C;text-transform:uppercase;display:flex;align-items:flex-end;border-bottom:1px solid #E4DECC;background:#F2ECDC">Beneficio</div>
+                <sc-for list="{{ p.heads }}" as="h" hint-placeholder-count="4">
+                  <div style="padding:12px 8px;text-align:center;border-bottom:1px solid #E4DECC;background:{{ h.bg }};color:{{ h.fg }};display:flex;flex-direction:column;justify-content:flex-end;gap:2px">
+                    <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;min-height:12px;color:#E7D9A8">{{ h.tag }}</span>
+                    <span style="font-family:Newsreader,serif;font-size:16px;font-weight:500">{{ h.name }}</span>
+                  </div>
+                </sc-for>
+                <sc-for list="{{ p.rows }}" as="row" hint-placeholder-count="10">
+                  <div style="padding:10px 16px;border-bottom:1px solid #ECE6D6;display:flex;flex-direction:column;justify-content:center;gap:2px">
+                    <span style="font-size:13px;font-weight:500;color:#17231A;line-height:1.35">{{ row.t }}</span>
+                    <sc-if value="{{ row.hasS }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#6A756C">{{ row.s }}</span></sc-if>
+                  </div>
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="4">
+                    <div style="padding:10px 8px;border-bottom:1px solid #ECE6D6;background:{{ c.bg }};display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.3;color:{{ c.fg }};font-weight:{{ c.fw }}">
+                      <sc-if value="{{ c.check }}" hint-placeholder-val="{{ true }}">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="{{ c.dot }}"></circle><path d="M5.2 9.3l2.4 2.4 5-5.2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </sc-if>
+                      <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ false }}"><span>{{ c.text }}</span></sc-if>
+                    </div>
+                  </sc-for>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </sc-if>
+
+    <!-- ===== PRECIOS ACTUALES ===== -->
+    <sc-if value="{{ isPrecios }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Precios actuales" style="width:100%;max-width:980px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:Newsreader,serif;font-size:30px;font-weight:500;color:#16361F">Precios actuales</div>
+            <div style="font-size:14px;color:#5F6B62">Valor por Vite {{ pr.unitStr }} · descuentos máximos por categoría</div>
+          </div>
+          <button onClick="{{ copyPrecios }}" style="height:40px;padding:0 14px;border:1px solid #CBD1C4;border-radius:10px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Copiar link de esta página</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+          <sc-for list="{{ pr.tiers }}" as="t" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #E1E3DA;border-top:3px solid {{ t.ac }};border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+                <span style="font-family:Newsreader,serif;font-size:22px;font-weight:500;color:#1F4D2B">{{ t.nombre }}</span>
+                <span style="font-size:12px;font-weight:600;color:#6A756C">{{ t.range }} Vites</span>
+              </div>
+              <div style="display:inline-flex;align-self:flex-start;height:28px;align-items:center;padding:0 10px;border-radius:14px;background:#EEF3EA;color:#1F4D2B;font-size:13px;font-weight:700"><span>Hasta {{ t.desc }}%</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#5F6B62">Valor por Vite</span><span style="font-weight:600;text-decoration:line-through;color:#8A948C">{{ t.unitStr }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#5F6B62">Con descuento</span><span style="font-weight:700;color:#17231A">{{ t.netStr }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#5F6B62">Ahorro por Vite</span><span style="font-weight:700;color:#2E6B3A">{{ t.saveStr }}</span></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:8px 0;overflow-x:auto">
+          <div style="min-width:640px">
+            <div style="display:grid;grid-template-columns:70px minmax(0,1.1fr) repeat(4,minmax(0,1fr));gap:12px;padding:12px 20px;font-size:11px;font-weight:700;letter-spacing:0.08em;color:#6A756C;text-transform:uppercase">
+              <span>Vites</span><span>Categoría</span><span style="text-align:right">Sin descuento</span><span style="text-align:right">Descuento</span><span style="text-align:right">Con descuento</span><span style="text-align:right">Ahorro</span>
+            </div>
+            <sc-for list="{{ pr.rows }}" as="r" hint-placeholder-count="12">
+              <div style="display:grid;grid-template-columns:70px minmax(0,1.1fr) repeat(4,minmax(0,1fr));gap:12px;padding:11px 20px;border-top:1px solid {{ r.bd }};font-size:14px;align-items:center;font-variant-numeric:tabular-nums;background:#fff">
+                <span style="font-weight:700">{{ r.q }}</span>
+                <span style="display:flex;align-items:center;gap:8px;color:#1F4D2B;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.ac }};flex:none"></span>{{ r.tier }}</span>
+                <span style="text-align:right;color:#5F6B62">{{ r.sub }}</span>
+                <span style="text-align:right;color:#5F6B62">{{ r.pct }}%</span>
+                <span style="text-align:right;font-weight:700">{{ r.net }}</span>
+                <span style="text-align:right;font-weight:600;color:#2E6B3A">{{ r.save }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding-top:8px">
+          <div style="font-family:Newsreader,serif;font-size:24px;font-weight:500;color:#16361F">Diferencia para subir de categoría</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+            <sc-for list="{{ pr.ups }}" as="u" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+                <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr)">
+                  <span></span>
+                  <div style="padding:14px 10px 10px;background:#fff;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6A756C">Plan actual</span>
+                    <span style="font-size:14px;font-weight:700;color:#17231A">{{ u.fromQ }} Vites</span>
+                    <span style="font-size:12px;color:#5F6B62">{{ u.fromT }}</span>
+                  </div>
+                  <div style="padding:14px 10px 10px;background:#FAFAF6;display:flex;flex-direction:column;gap:2px">
+                    <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#6A756C">Si sube a</span>
+                    <span style="font-size:14px;font-weight:700;color:#1F4D2B">{{ u.toQ }} Vites</span>
+                    <span style="font-size:12px;color:#5F6B62">{{ u.toT }}</span>
+                  </div>
+                  <span style="padding:10px 14px;font-size:13px;color:#5F6B62;border-top:1px solid #EEF0EA">Descuento</span>
+                  <span style="padding:10px;font-size:13px;font-weight:600;border-top:1px solid #EEF0EA;background:#fff">{{ u.pA }}%</span>
+                  <span style="padding:10px;font-size:13px;font-weight:600;border-top:1px solid #EEF0EA;background:#FAFAF6">{{ u.pB }}%</span>
+                  <span style="padding:10px 14px;font-size:13px;color:#5F6B62;border-top:1px solid #EEF0EA">Total a pagar</span>
+                  <span style="padding:10px;font-size:13px;font-weight:700;border-top:1px solid #EEF0EA;background:#fff">{{ u.netA }}</span>
+                  <span style="padding:10px;font-size:13px;font-weight:700;border-top:1px solid #EEF0EA;background:#FAFAF6">{{ u.netB }}</span>
+                  <span style="padding:10px 14px;font-size:13px;color:#5F6B62;border-top:1px solid #EEF0EA">Se gana con el descuento</span>
+                  <span style="padding:10px;font-size:13px;font-weight:600;color:#2E6B3A;border-top:1px solid #EEF0EA;background:#fff">{{ u.svA }}</span>
+                  <span style="padding:10px;font-size:13px;font-weight:600;color:#2E6B3A;border-top:1px solid #EEF0EA;background:#FAFAF6">{{ u.svB }}</span>
+                </div>
+                <div style="padding:14px 16px;border-top:1px solid #E1E3DA;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12px;color:#5F6B62;font-weight:600">Por 1 Vite más, solo paga</span>
+                  <span style="font-family:Newsreader,serif;font-size:28px;font-weight:500;line-height:1.1;color:#16361F">+{{ u.diff }}</span>
+                  <span style="font-size:12px;color:#6A756C">En lugar de {{ u.oneFull }}, que es el valor normal de un Vite.</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#5F6B62">Valores con el descuento máximo de cada categoría. Financiación sin intereses hasta {{ cfg.maxCuotas }} cuotas.</div>
+      </section>
+    </sc-if>
+
+    <!-- ===== ADMINISTRADOR ===== -->
+    <sc-if value="{{ isAdminLogin }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Admin acceso" style="width:100%;max-width:400px;margin-top:48px;background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Newsreader,serif;font-size:26px;font-weight:500;color:#16361F">Administrador</div>
+        <div style="font-size:14px;color:#5F6B62">Precios, descuentos, asesoras y beneficios.</div>
+        <input type="password" value="{{ pass }}" onChange="{{ onPass }}" onKeyDown="{{ onPassKey }}" placeholder="Clave" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
+        <sc-if value="{{ passErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#9B3B1C;font-weight:600">Clave incorrecta.</div></sc-if>
+        <button onClick="{{ doLogin }}" style="height:46px;border:0;border-radius:12px;background:#1F4D2B;color:#fff;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#16361F">Entrar</button>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAdminOk }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Admin" style="width:100%;max-width:980px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:Newsreader,serif;font-size:30px;font-weight:500;color:#16361F">Administrador</div>
+            <div style="font-size:14px;color:#5F6B62">Los cambios aplican a todas las asesoras al publicarlos en GitHub.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onClick="{{ adm.saveLocal }}" style="height:42px;padding:0 16px;border:1px solid #CBD1C4;border-radius:10px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Guardar en este equipo</button>
+            <button onClick="{{ adm.publish }}" style="height:42px;padding:0 16px;border:0;border-radius:10px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#16361F">Guardar y publicar</button>
+          </div>
+        </div>
+        <sc-if value="{{ hasStatus }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px;font-weight:600;color:#1F4D2B;background:#EEF3EA;border-radius:10px;padding:12px 14px">{{ status }}</div>
+        </sc-if>
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:15px;font-weight:700">General</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Precio por Vite
+              <input value="{{ adm.precioStr }}" onChange="{{ adm.onPrecio }}" inputMode="numeric" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:600;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Máximo de cuotas
+              <input value="{{ adm.maxCuotas }}" onChange="{{ adm.onMaxCuotas }}" inputMode="numeric" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:600;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Tope total con descuento adicional (%)
+              <input value="{{ adm.topeTotal }}" onChange="{{ adm.onTope }}" inputMode="numeric" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:600;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Razón social
+              <input value="{{ adm.empresa }}" onChange="{{ adm.onEmpresa }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">NIT
+              <input value="{{ adm.nit }}" onChange="{{ adm.onNit }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;width:100%;outline:none"></label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Nota al pie
+            <input value="{{ adm.nota }}" onChange="{{ adm.onNota }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:15px;font-weight:700">Categorías y descuentos</div>
+          <div style="overflow-x:auto">
+            <div style="min-width:620px;display:grid;grid-template-columns:minmax(140px,1.4fr) repeat(4,minmax(90px,1fr));gap:8px;align-items:center">
+              <span style="font-size:12px;font-weight:700;color:#6A756C">Nombre</span><span style="font-size:12px;font-weight:700;color:#6A756C">Desde (Vites)</span><span style="font-size:12px;font-weight:700;color:#6A756C">Hasta (vacío = sin límite)</span><span style="font-size:12px;font-weight:700;color:#6A756C">Desc. compra máx. %</span><span style="font-size:12px;font-weight:700;color:#6A756C">Desc. productos %</span>
+              <sc-for list="{{ adm.tiers }}" as="t" hint-placeholder-count="4">
+                <input value="{{ t.nombre }}" onChange="{{ t.onNombre }}" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;font-weight:600;width:100%;outline:none">
+                <input value="{{ t.min }}" onChange="{{ t.onMin }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;width:100%;outline:none">
+                <input value="{{ t.maxStr }}" onChange="{{ t.onMax }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;width:100%;outline:none">
+                <input value="{{ t.desc }}" onChange="{{ t.onDesc }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;font-weight:600;width:100%;outline:none">
+                <input value="{{ t.prod }}" onChange="{{ t.onProd }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;width:100%;outline:none">
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:15px;font-weight:700">Asesoras</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ adm.asesoras }}" as="a" hint-placeholder-count="2">
+              <span style="display:flex;align-items:center;gap:6px;height:36px;padding:0 6px 0 14px;border-radius:18px;background:#EEF3EA;font-size:14px;font-weight:600;color:#1F4D2B">{{ a.n }}<button onClick="{{ a.del }}" title="Quitar" style="width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:#4F6B55;font-size:16px;cursor:pointer" style-hover="background:#DCE7D6">×</button></span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;max-width:420px">
+            <input value="{{ newAsesora }}" onChange="{{ adm.onNewAsesora }}" onKeyDown="{{ adm.onNewKey }}" placeholder="Nombre de la asesora" style="flex:1;height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;outline:none">
+            <button onClick="{{ adm.addAsesora }}" style="height:42px;padding:0 16px;border:0;border-radius:10px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Agregar</button>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+            <div style="font-size:15px;font-weight:700">Beneficios</div>
+            <div style="font-size:12px;color:#6A756C">Escribe <strong>si</strong> para ✓, <strong>-</strong> si no aplica, o cualquier texto. Cantidad y descuentos se generan solos.</div>
+          </div>
+          <div style="overflow-x:auto">
+            <div style="min-width:760px;display:grid;grid-template-columns:minmax(200px,2fr) minmax(140px,1.4fr) repeat(4,minmax(80px,1fr)) 36px;gap:8px;align-items:center">
+              <span style="font-size:12px;font-weight:700;color:#6A756C">Beneficio</span><span style="font-size:12px;font-weight:700;color:#6A756C">Detalle (opcional)</span>
+              <sc-for list="{{ adm.tierNames }}" as="tn" hint-placeholder-count="4"><span style="font-size:12px;font-weight:700;color:#6A756C">{{ tn }}</span></sc-for>
+              <span></span>
+              <sc-for list="{{ adm.ben }}" as="b" hint-placeholder-count="8">
+                <input value="{{ b.t }}" onChange="{{ b.onT }}" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:13px;width:100%;outline:none">
+                <input value="{{ b.s }}" onChange="{{ b.onS }}" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:13px;width:100%;outline:none">
+                <sc-for list="{{ b.cells }}" as="c" hint-placeholder-count="4">
+                  <input value="{{ c.v }}" onChange="{{ c.onV }}" style="height:40px;padding:0 8px;border:1px solid #D6DBD0;border-radius:9px;font-size:13px;width:100%;text-align:center;outline:none">
+                </sc-for>
+                <button onClick="{{ b.del }}" title="Eliminar" style="width:36px;height:36px;border:0;border-radius:8px;background:transparent;color:#9B3B1C;font-size:18px;cursor:pointer" style-hover="background:#F8EAE4">×</button>
+              </sc-for>
+            </div>
+          </div>
+          <button onClick="{{ adm.addBen }}" style="align-self:flex-start;height:40px;padding:0 14px;border:1px dashed #B9C2B2;border-radius:10px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer">+ Agregar beneficio</button>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:15px;font-weight:700">Publicación en GitHub</div>
+          <div style="font-size:13px;color:#5F6B62">“Guardar y publicar” actualiza <code>config.json</code> en el repositorio. Las asesoras ven el cambio en 1 a 2 minutos. El token queda guardado solo en este equipo.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Usuario / organización<input value="{{ adm.gh.owner }}" onChange="{{ adm.onGhOwner }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Repositorio<input value="{{ adm.gh.repo }}" onChange="{{ adm.onGhRepo }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Rama<input value="{{ adm.gh.branch }}" onChange="{{ adm.onGhBranch }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Token<input type="password" value="{{ token }}" onChange="{{ adm.onToken }}" placeholder="github_pat_…" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <button onClick="{{ adm.download }}" style="border:0;background:none;color:#1F4D2B;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Descargar config.json</button>
+            <button onClick="{{ adm.restore }}" style="border:0;background:none;color:#9B3B1C;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Restaurar valores iniciales</button>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ hasLink }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLink }}" style="position:fixed;inset:0;background:rgba(22,54,31,0.35);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px">
+      <div onClick="{{ stop }}" style="width:100%;max-width:520px;background:#fff;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <span style="font-family:Newsreader,serif;font-size:22px;font-weight:500;color:#16361F">{{ linkTitle }}</span>
+          <button onClick="{{ closeLink }}" style="width:36px;height:36px;border:0;border-radius:10px;background:#F4F6F1;font-size:18px;cursor:pointer;color:#4A564D">×</button>
+        </div>
+        <input readOnly="{{ true }}" value="{{ linkUrl }}" onFocus="{{ selectAll }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:13px;color:#4A564D;width:100%;outline:none;background:#F6F7F3">
+        <div style="font-size:13px;color:#5F6B62">{{ linkMsg }}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+          <button onClick="{{ doCopy }}" style="height:44px;border:0;border-radius:12px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Copiar</button>
+          <sc-if value="{{ canShare }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ doShare }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer">Compartir…</button>
+          </sc-if>
+          <button onClick="{{ doOpen }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer">Abrir</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16361F;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:50">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const DEF = {
+  updatedAt: 0,
+  empresa: 'AVOVITE S.A.S.',
+  nit: '901446849-9',
+  precio: 2580000,
+  maxCuotas: 8,
+  topeTotal: 30,
+  nota: 'Los valores quedan sujetos a confirmación de pago y disponibilidad.',
+  asesoras: ['Paola Acero', 'Lizeth Heredia'],
+  tiers: [
+    { nombre: 'Vite', min: 1, max: 2, desc: 10, prod: 10 },
+    { nombre: 'Vite Plus', min: 3, max: 4, desc: 15, prod: 15 },
+    { nombre: 'Vite Select', min: 5, max: 9, desc: 20, prod: 20 },
+    { nombre: 'Vite Private', min: 10, max: null, desc: 25, prod: 25 }
+  ],
+  beneficios: [
+    { t: 'Único pago por 20 años de ingresos', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Beneficiario para tus Vites', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Visitas a la finca, acceso a plataforma, documentos, fotos e informes', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Póliza agrícola para tus Vites', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Caja sorpresa “De la finca a tu casa”', s: '', v: ['-', '1 vez', '1 vez', '1 vez'] },
+    { t: 'Tour del Aguacate: experiencia inmersiva + acompañante', s: '', v: ['-', '-', '1 vez + 1 acompañante', '1 vez + 2 acompañantes'] },
+    { t: 'Sesión en vivo con directivos Avovite', s: '', v: ['-', '-', 'si', 'si'] },
+    { t: 'Beneficios exclusivos para clientes Private', s: 'Eventos, charlas, pruebas de productos y mucho más', v: ['-', '-', '-', 'si'] }
+  ],
+  github: { owner: 'rodrigoppfx-code', repo: 'Plantilla-de-Simulacion-Financiacion', branch: 'main', path: 'config.json' }
+};
+const LS_CFG = 'avovite_config_v2', LS_TOK = 'avovite_gh_token', PASS = 'Avocate2024*';
+const clone = o => JSON.parse(JSON.stringify(o));
+const pad = n => String(n).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseIso = s => { const [y, m, d] = String(s || '').split('-').map(Number); return y ? new Date(y, m - 1, d) : new Date(); };
+const todayIso = () => iso(new Date());
+const addMonths = (s, k) => { const d = parseIso(s), day = d.getDate(); const t = new Date(d.getFullYear(), d.getMonth() + k, 1); const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate(); t.setDate(Math.min(day, last)); return iso(t); };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const fLong = s => cap(parseIso(s).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+const fDate = s => parseIso(s).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+const money = n => '$' + Math.round(n || 0).toLocaleString('es-CO');
+const digits = v => Number(String(v).replace(/\D/g, '')) || 0;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const enc = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const dec = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+const genId = () => { const d = new Date(); return `AV-${String(d.getFullYear()).slice(2)}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${Math.floor(1000 + Math.random() * 9000)}`; };
+const tierFor = (cfg, q) => { const ts = cfg.tiers; for (const t of ts) if (q >= t.min && (t.max == null || t.max === '' || q <= t.max)) return t; return q < ts[0].min ? ts[0] : ts[ts.length - 1]; };
+const rangeOf = t => (t.max == null || t.max === '') ? `${t.min}+` : `${t.min}–${t.max}`;
+const isYes = v => /^(si|sí|✓|x)$/i.test(String(v).trim());
+const isNo = v => /^(-|–|no|)$/i.test(String(v).trim());
+
+class Component extends DCLogic {
+  state = { mode: 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', token: '', link: null };
+  propRef = React.createRef();
+  ov = {}; sig = '';
+
+  newF(cfg) {
+    const t = tierFor(cfg, 1);
+    return { id: genId(), date: todayIso(), nombre: '', cel: '', mail: '', asesora: cfg.asesoras[0] || '', q: 1, d: t.desc, auth: false, x: 0, modo: 'contado', abono: 0, n: 4, first: addMonths(todayIso(), 1) };
+  }
+
+  demoF(cfg) {
+    const f = this.newF(cfg), q = 5, t = tierFor(cfg, q);
+    const total = q * cfg.precio * (1 - t.desc / 100);
+    return { ...f, nombre: 'Rodrigo', q, d: t.desc, modo: 'financiado', n: 4, abono: Math.round(total / 5) };
+  }
+
+  componentDidMount() {
+    const h = location.hash || '';
+    if (h === '#precios') this.setState({ mode: 'precios' });
+    if (h.startsWith('#p=')) { try { this.setState({ mode: 'cliente', f: JSON.parse(dec(h.slice(3))) }); } catch (e) {} }
+    try { this.setState({ token: localStorage.getItem(LS_TOK) || '' }); } catch (e) {}
+    this.loadConfig();
+  }
+
+  async loadConfig() {
+    let local = null, remote = null;
+    try { local = JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (e) {}
+    try { const r = await fetch('config.json?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) remote = await r.json(); } catch (e) {}
+    const pick = [local, remote].filter(Boolean).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+    if (!pick) return;
+    const cfg = { ...clone(DEF), ...pick, github: { ...DEF.github, ...(pick.github || {}) } };
+    this.setState(s => ({ cfg, f: (s.mode === 'cliente' || this.touched) ? s.f : this.newF(cfg) }));
+  }
+
+  setF(patch) { this.touched = true; this.setState(s => ({ f: { ...s.f, ...patch } })); }
+  async copyText(t) {
+    try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
+    try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; }
+  }
+  async showLink(url, title) {
+    const ok = await this.copyText(url);
+    this.setState({ link: { url, title, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'Toca “Copiar” o mantén presionado el link para copiarlo.' } });
+  }
+  flash(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2400); }
+
+  compute() {
+    const { cfg, f, mode } = this.state;
+    const client = mode === 'cliente';
+    const unit = client ? (f.unit || cfg.precio) : cfg.precio;
+    const t = tierFor(cfg, f.q), ti = cfg.tiers.indexOf(t);
+    const d = client ? f.d : clamp(f.d, 0, t.desc);
+    const xMax = Math.max(0, (cfg.topeTotal || 0) - d);
+    const x = f.auth ? (client ? f.x : clamp(f.x, 0, xMax)) : 0;
+    const sub = f.q * unit, dv = Math.round(sub * d / 100), xv = Math.round(sub * x / 100), total = sub - dv - xv;
+    const fin = f.modo === 'financiado';
+    let abono = 0, saldo = 0, cuotas = [];
+    if (fin) {
+      abono = clamp(f.abono || 0, 0, total); saldo = total - abono;
+      if (client && f.cuotas) cuotas = f.cuotas.map(([v, dt]) => ({ v, d: dt }));
+      else {
+        const n = clamp(f.n, 1, cfg.maxCuotas);
+        const sig = [total, abono, n, f.first].join('|');
+        if (sig !== this.sig) { this.sig = sig; this.ov = {}; }
+        const base = Math.floor(saldo / n / 1000) * 1000;
+        for (let i = 0; i < n; i++) {
+          const o = this.ov[i] || {};
+          cuotas.push({ v: o.v != null ? o.v : (i === n - 1 ? saldo - base * (n - 1) : base), d: o.d || addMonths(f.first, i) });
+        }
+      }
+    }
+    return { cfg, f, client, unit, t, ti, d, x, xMax, sub, dv, xv, total, fin, abono, saldo, cuotas };
+  }
+
+  payload(c) {
+    const { f } = this.state;
+    return { ...f, unit: c.unit, d: c.d, x: c.x, abono: c.abono, cuotas: c.fin ? c.cuotas.map(q => [q.v, q.d]) : null };
+  }
+  linkFor(c) { return location.href.split('#')[0] + '#p=' + enc(JSON.stringify(this.payload(c))); }
+
+  async capture() {
+    const el = this.propRef.current; if (!el || !window.html2canvas) throw new Error('no-lib');
+    const prevW = el.style.width, prevMax = el.style.maxWidth;
+    const sc = el.querySelectorAll('[data-scroll]');
+    el.style.width = '820px'; el.style.maxWidth = '820px'; sc.forEach(n => n.style.overflowX = 'visible');
+    try { if (document.fonts) await document.fonts.ready; return await window.html2canvas(el, { scale: 2, backgroundColor: '#FBF8F0', useCORS: true }); }
+    finally { el.style.width = prevW; el.style.maxWidth = prevMax; sc.forEach(n => n.style.overflowX = 'auto'); }
+  }
+  fileName() { const { f } = this.state; const n = (f.nombre || 'cliente').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); return `propuesta-avovite-${n}-${f.date}`; }
+  guard() { if (!this.state.f.nombre.trim()) { this.flash('Escribe el nombre del cliente'); return false; } return true; }
+
+  async dlPdf() {
+    if (!this.guard() || this.state.busy) return;
+    this.setState({ busy: 'pdf' });
+    try {
+      const c = await this.capture(); const w = c.width / 2, h = c.height / 2;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: h > w ? 'p' : 'l', unit: 'px', format: [w, h], hotfixes: ['px_scaling'] });
+      pdf.addImage(c.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, w, h);
+      pdf.save(this.fileName() + '.pdf');
+    } catch (e) { this.flash('No se pudo generar el PDF'); }
+    this.setState({ busy: '' });
+  }
+  async dlImg() {
+    if (!this.guard() || this.state.busy) return;
+    this.setState({ busy: 'img' });
+    try {
+      const c = await this.capture();
+      const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = this.fileName() + '.png'; a.click();
+    } catch (e) { this.flash('No se pudo generar la imagen'); }
+    this.setState({ busy: '' });
+  }
+
+  edit(fn) { this.setState(s => { const d = clone(s.draft); fn(d); return { draft: d }; }); }
+  async publish() {
+    const cfg = { ...clone(this.state.draft), updatedAt: Date.now() };
+    this.saveLocal(cfg, true);
+    const tok = this.state.token.trim(); const g = cfg.github;
+    if (!tok) { this.setState({ status: 'Guardado en este equipo. Para publicar a todas las asesoras, pega el token de GitHub abajo.' }); return; }
+    this.setState({ status: 'Publicando…' });
+    try {
+      const url = `https://api.github.com/repos/${g.owner}/${g.repo}/contents/${g.path}`;
+      const hd = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' };
+      let sha; const r0 = await fetch(url + '?ref=' + encodeURIComponent(g.branch), { headers: hd }); if (r0.ok) sha = (await r0.json()).sha;
+      const body = { message: 'Actualizar precios y beneficios (admin)', content: btoa(unescape(encodeURIComponent(JSON.stringify(cfg, null, 2)))), branch: g.branch }; if (sha) body.sha = sha;
+      const r = await fetch(url, { method: 'PUT', headers: { ...hd, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(r.status);
+      this.setState({ status: 'Publicado. Las asesoras verán los cambios en 1 a 2 minutos.' });
+    } catch (e) { this.setState({ status: 'No se pudo publicar (' + e.message + '). Revisa el token y el repositorio. Los cambios sí quedaron en este equipo.' }); }
+  }
+  saveLocal(cfg, quiet) {
+    cfg = cfg || { ...clone(this.state.draft), updatedAt: Date.now() };
+    try { localStorage.setItem(LS_CFG, JSON.stringify(cfg)); } catch (e) {}
+    this.setState(s => ({ cfg, draft: clone(cfg), f: { ...s.f, asesora: cfg.asesoras.includes(s.f.asesora) ? s.f.asesora : (cfg.asesoras[0] || '') }, status: quiet ? s.status : 'Guardado en este equipo.' }));
+  }
+
+  renderVals() {
+    const c = this.compute();
+    const { cfg, f, t, ti } = c;
+    const { mode } = this.state;
+    const on = {
+      nombre: e => this.setF({ nombre: e.target.value }),
+      cel: e => this.setF({ cel: e.target.value }),
+      mail: e => this.setF({ mail: e.target.value }),
+      asesora: e => this.setF({ asesora: e.target.value }),
+      q: e => this.setQ(digits(e.target.value) || 1),
+      d: e => this.setF({ d: clamp(digits(e.target.value), 0, t.desc) }),
+      auth: e => this.setF({ auth: e.target.checked, x: e.target.checked ? f.x : 0 }),
+      x: e => this.setF({ x: clamp(digits(e.target.value), 0, c.xMax) }),
+      abono: e => this.setF({ abono: clamp(digits(e.target.value), 0, c.total) }),
+      first: e => this.setF({ first: e.target.value || f.first })
+    };
+    this.setQ = q => { q = clamp(q, 1, 999); const nt = tierFor(cfg, q); const patch = { q }; if (nt !== tierFor(cfg, this.state.f.q)) patch.d = nt.desc; this.setF(patch); };
+
+    const pay = !c.fin
+      ? [{ label: 'Pago de contado', date: fDate(f.date), amount: money(c.total) }]
+      : [{ label: 'Abono inicial', date: fDate(f.date), amount: money(c.abono) }].concat(c.cuotas.map((q, i) => ({ label: `Cuota ${i + 1} de ${c.cuotas.length}`, date: fDate(q.d), amount: money(q.v) })));
+    const sumC = c.cuotas.reduce((a, q) => a + (q.v || 0), 0), diff = c.saldo - sumC;
+
+    const heads = cfg.tiers.map((x, j) => ({ name: x.nombre, tag: j === ti ? 'Tu categoría' : '', bg: j === ti ? '#1F4D2B' : '#F2ECDC', fg: j === ti ? '#fff' : '#1F4D2B' }));
+    const mkRow = (tt, s, vals) => ({ t: tt, s, hasS: !!s, cells: vals.map((v, j) => {
+      const hi = j === ti, yes = isYes(v), no = isNo(v);
+      return { check: yes, isText: !yes, text: no ? '—' : v, bg: hi ? '#E8EEDD' : 'transparent', fg: no ? '#A7AEA8' : (hi ? '#16361F' : '#2F3A32'), fw: hi ? 600 : 400, dot: hi ? '#1F4D2B' : '#7FA86A' };
+    }) });
+    const rows = [
+      mkRow('Cantidad de Vites', '', cfg.tiers.map(rangeOf)),
+      mkRow('Descuento en la compra de tus Vites', '', cfg.tiers.map(x => `Hasta ${x.desc}%`)),
+      ...cfg.beneficios.map(b => mkRow(b.t, b.s, cfg.tiers.map((_, j) => b.v[j] ?? '-'))),
+      mkRow('Descuento en productos Avovite', '', cfg.tiers.map(x => `Hasta ${x.prod}%`))
+    ];
+
+    const totPct = c.d + c.x;
+    const p = {
+      id: f.id, dateLong: fLong(f.date), nombre: f.nombre.trim() || 'Nombre del cliente',
+      contact: [f.cel, f.mail].filter(Boolean).join('  ·  ') || ' ', asesora: f.asesora || '—',
+      q: f.q, vitesWord: f.q === 1 ? 'Vite' : 'Vites', unitStr: money(c.unit), subStr: money(c.sub),
+      tierName: t.nombre, tierRange: rangeOf(t), tierMax: t.desc, d: c.d, x: c.x, xMax: c.xMax,
+      hasD: c.d > 0, hasX: f.auth && c.x > 0, dvStr: money(c.dv), xvStr: money(c.xv),
+      totalStr: money(c.total), hasSave: totPct > 0, saveStr: money(c.dv + c.xv), totPct,
+      fin: c.fin, abonoIn: c.abono ? money(c.abono) : '', saldoStr: money(c.saldo),
+      planNote: c.fin ? `${c.cuotas.length} ${c.cuotas.length === 1 ? 'cuota' : 'cuotas'} sin intereses` : 'Pago único',
+      pay, hasDiff: c.fin && diff !== 0, diffMsg: diff > 0 ? `Faltan ${money(diff)} por asignar en las cuotas.` : `Las cuotas superan el saldo por ${money(-diff)}.`,
+      nota: String(cfg.nota || '').replace(/^Propuesta válida[^.]*\.\s*/i, ''),
+      finNote: c.fin ? `Pagas el saldo de ${money(c.saldo)} en ${c.cuotas.length} ${c.cuotas.length === 1 ? 'cuota' : 'cuotas'} sin ningún recargo.` : '',
+      heads, rows, expired: c.client && f.date !== todayIso()
+    };
+
+    const cuotaEd = c.fin && !c.client ? c.cuotas.map((q, i) => ({
+      n: i + 1, vStr: money(q.v), d: q.d,
+      onV: e => { this.ov[i] = { ...(this.ov[i] || {}), v: digits(e.target.value) }; this.forceUpdate(); },
+      onD: e => { this.ov[i] = { ...(this.ov[i] || {}), d: e.target.value }; this.forceUpdate(); }
+    })) : [];
+    const nOpts = Array.from({ length: cfg.maxCuotas || 1 }, (_, i) => { const n = i + 1, sel = n === clamp(f.n, 1, cfg.maxCuotas); return { n, pick: () => this.setF({ n }), bg: sel ? '#1F4D2B' : '#fff', fg: sel ? '#fff' : '#1F4D2B', bd: sel ? '#1F4D2B' : '#D6DBD0' }; });
+    const seg = a => a ? { bg: '#fff', fg: '#16361F', sh: '0 1px 3px rgba(0,0,0,0.1)' } : { bg: 'transparent', fg: '#5F6B62', sh: 'none' };
+
+    const dr = this.state.draft || cfg;
+    const adm = {
+      precioStr: money(dr.precio), onPrecio: e => this.edit(d => d.precio = digits(e.target.value)),
+      maxCuotas: dr.maxCuotas, onMaxCuotas: e => this.edit(d => d.maxCuotas = clamp(digits(e.target.value), 1, 36)),
+      topeTotal: dr.topeTotal, onTope: e => this.edit(d => d.topeTotal = clamp(digits(e.target.value), 0, 100)),
+      empresa: dr.empresa, onEmpresa: e => this.edit(d => d.empresa = e.target.value),
+      nit: dr.nit, onNit: e => this.edit(d => d.nit = e.target.value),
+      nota: dr.nota, onNota: e => this.edit(d => d.nota = e.target.value),
+      tiers: dr.tiers.map((x, i) => ({ ...x, maxStr: x.max == null ? '' : x.max,
+        onNombre: e => this.edit(d => d.tiers[i].nombre = e.target.value),
+        onMin: e => this.edit(d => d.tiers[i].min = digits(e.target.value)),
+        onMax: e => this.edit(d => d.tiers[i].max = e.target.value.trim() === '' ? null : digits(e.target.value)),
+        onDesc: e => this.edit(d => d.tiers[i].desc = clamp(digits(e.target.value), 0, 100)),
+        onProd: e => this.edit(d => d.tiers[i].prod = clamp(digits(e.target.value), 0, 100)) })),
+      tierNames: dr.tiers.map(x => x.nombre),
+      asesoras: dr.asesoras.map((n, i) => ({ n, del: () => { if (confirm('¿Quitar a ' + n + '?')) this.edit(d => d.asesoras.splice(i, 1)); } })),
+      onNewAsesora: e => this.setState({ newAsesora: e.target.value }),
+      addAsesora: () => { const n = this.state.newAsesora.trim(); if (!n) return; this.edit(d => d.asesoras.push(n)); this.setState({ newAsesora: '' }); },
+      ben: dr.beneficios.map((b, i) => ({ t: b.t, s: b.s,
+        onT: e => this.edit(d => d.beneficios[i].t = e.target.value),
+        onS: e => this.edit(d => d.beneficios[i].s = e.target.value),
+        del: () => { if (confirm('¿Eliminar el beneficio “' + b.t + '”?')) this.edit(d => d.beneficios.splice(i, 1)); },
+        cells: dr.tiers.map((_, j) => ({ v: b.v[j] ?? '', onV: e => this.edit(d => { d.beneficios[i].v[j] = e.target.value; }) })) })),
+      addBen: () => this.edit(d => d.beneficios.push({ t: 'Nuevo beneficio', s: '', v: d.tiers.map(() => '-') })),
+      gh: dr.github,
+      onGhOwner: e => this.edit(d => d.github.owner = e.target.value.trim()),
+      onGhRepo: e => this.edit(d => d.github.repo = e.target.value.trim()),
+      onGhBranch: e => this.edit(d => d.github.branch = e.target.value.trim()),
+      onToken: e => { const v = e.target.value; this.setState({ token: v }); try { localStorage.setItem(LS_TOK, v); } catch (x) {} },
+      saveLocal: () => this.saveLocal(),
+      publish: () => this.publish(),
+      download: () => { const b = new Blob([JSON.stringify({ ...dr, updatedAt: Date.now() }, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'config.json'; a.click(); },
+      restore: () => { if (confirm('¿Restaurar precios, descuentos y beneficios iniciales? (No se publica hasta que guardes)')) this.setState({ draft: clone(DEF), status: 'Valores iniciales cargados. Guarda para aplicarlos.' }); }
+    };
+    adm.onNewKey = e => { if (e.key === 'Enter') adm.addAsesora(); };
+
+    const doLogin = () => { if (this.state.pass === PASS) this.setState({ adminOk: true, passErr: false, draft: clone(this.state.cfg), status: '' }); else this.setState({ passErr: true }); };
+
+    const PAL = [{ bg: '#F3F8EE', ac: '#7FA86A', bd: '#E3EDDA' }, { bg: '#E7F1DE', ac: '#4F8A45', bd: '#D5E5C8' }, { bg: '#F8F0DA', ac: '#B08D3C', bd: '#EDE0BC' }, { bg: '#E1EBE3', ac: '#1F4D2B', bd: '#CBDACE' }];
+    const pal = x => PAL[cfg.tiers.indexOf(x) % PAL.length];
+    const netQ = q => { const x = tierFor(cfg, q), sub = q * cfg.precio, sv = Math.round(sub * x.desc / 100); return { x, net: sub - sv, sv }; };
+    const ups = cfg.tiers.slice(1).map(x => { const b = x.min, a = b - 1; if (a < 1) return null; const A = netQ(a), B = netQ(b); return { fromQ: a, toQ: b, fromT: A.x.nombre, toT: B.x.nombre, acA: pal(A.x).ac, acB: pal(B.x).ac, bgA: pal(A.x).bg, bgB: pal(B.x).bg, oneFull: money(cfg.precio), diff: money(B.net - A.net), netA: money(A.net), netB: money(B.net), pA: A.x.desc, pB: B.x.desc, svA: money(A.sv), svB: money(B.sv) }; }).filter(Boolean);
+    const pr = {
+      unitStr: money(cfg.precio), ups,
+      tiers: cfg.tiers.map(x => ({ ac: pal(x).ac, nombre: x.nombre, range: rangeOf(x), desc: x.desc, unitStr: money(cfg.precio), netStr: money(cfg.precio * (1 - x.desc / 100)), saveStr: money(cfg.precio * x.desc / 100) })),
+      rows: Array.from({ length: 12 }, (_, i) => { const q = i + 1, x = tierFor(cfg, q), sub = q * cfg.precio, sv = Math.round(sub * x.desc / 100); return { q, tier: x.nombre, sub: money(sub), pct: x.desc, net: money(sub - sv), save: money(sv), bd: (q > 1 && tierFor(cfg, q - 1) !== x) ? '#C9CFC0' : '#EEF0EA', ac: pal(x).ac }; })
+    };
+    return {
+      cfg, f, p, on, adm, cuotaEd, nOpts, pr,
+      isPrecios: mode === 'precios', tabP: seg(mode === 'precios'),
+      goPrecios: () => this.setState({ mode: 'precios' }),
+      copyPrecios: () => this.showLink(location.href.split('#')[0] + '#precios', 'Link de precios actuales'),
+      asesoras: cfg.asesoras.length ? cfg.asesoras : ['—'],
+      isAsesora: mode === 'asesora', isCliente: mode === 'cliente', notCliente: mode !== 'cliente',
+      showProposal: mode === 'asesora' || mode === 'cliente',
+      isAdminLogin: mode === 'admin' && !this.state.adminOk, isAdminOk: mode === 'admin' && this.state.adminOk,
+      tabA: seg(mode === 'asesora'), tabB: seg(mode === 'admin'), segC: seg(!c.fin), segF: seg(c.fin),
+      goAsesora: () => this.setState({ mode: 'asesora' }), goAdmin: () => this.setState({ mode: 'admin' }),
+      qMinus: () => this.setQ(f.q - 1), qPlus: () => this.setQ(f.q + 1),
+      setContado: () => this.setF({ modo: 'contado' }), setFin: () => this.setF({ modo: 'financiado' }),
+      resetCuotas: () => { this.ov = {}; this.forceUpdate(); },
+      dlPdf: () => this.dlPdf(), dlImg: () => this.dlImg(),
+      busyPdf: this.state.busy === 'pdf' ? 'Generando PDF…' : 'Descargar PDF',
+      busyImg: this.state.busy === 'img' ? 'Generando…' : 'Descargar imagen',
+      copyLink: () => { if (!this.guard()) return; this.showLink(this.linkFor(c), 'Link de la propuesta'); },
+      hasLink: !!this.state.link, linkUrl: this.state.link?.url || '', linkTitle: this.state.link?.title || '', linkMsg: this.state.link?.msg || '',
+      closeLink: () => this.setState({ link: null }), stop: e => e.stopPropagation(), selectAll: e => e.target.select(),
+      canShare: !!navigator.share,
+      doCopy: async () => { const ok = await this.copyText(this.state.link.url); this.setState(s => ({ link: { ...s.link, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'No se pudo copiar automáticamente: mantén presionado el link y elige Copiar.' } })); },
+      doShare: () => { const l = this.state.link; navigator.share({ title: 'Propuesta Avovite', url: l.url }).catch(() => {}); },
+      doOpen: () => window.open(this.state.link.url, '_blank'),
+      openClient: () => window.open(this.linkFor(c), '_blank'),
+      resetAll: () => { this.touched = false; this.ov = {}; this.setState({ f: this.newF(cfg) }); },
+      propRef: this.propRef,
+      pass: this.state.pass, passErr: this.state.passErr,
+      onPass: e => this.setState({ pass: e.target.value, passErr: false }),
+      onPassKey: e => { if (e.key === 'Enter') doLogin(); }, doLogin,
+      newAsesora: this.state.newAsesora, token: this.state.token,
+      status: this.state.status, hasStatus: !!this.state.status,
+      toast: this.state.toast, hasToast: !!this.state.toast
+    };
+  }
+}
+</script>
 </body>
 </html>

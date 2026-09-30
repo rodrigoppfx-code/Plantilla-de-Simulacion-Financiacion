@@ -1,34 +1,26 @@
-# Plantilla de Simulacion Financiacion
+# Instrucciones de uso
 
-## Archivos principales
+## Para asesoras
 
-- `index.html`: version principal lista para Avovite, con logo y datos fijos.
-- `assets/`: carpeta obligatoria. Contiene logo, estilos, calculos y librerias para descargar PDF/imagen.
-- `README.md`: guia para GitHub.
-- `.nojekyll`: archivo para evitar problemas de rutas en GitHub Pages.
+1. Entra a la pagina publicada.
+2. Selecciona `Nueva propuesta`.
+3. Escribe nombre, celular y correo del cliente.
+4. Selecciona asesora.
+5. Cambia la cantidad de Vites. La categoria y el descuento maximo se ajustan solos.
+6. Si hay descuento adicional autorizado, activa la casilla y escribe el porcentaje extra permitido.
+7. Elige pago de contado o financiado.
+8. Si es financiado, revisa abono, numero de cuotas, valores y fechas.
+9. Usa `Repartir en partes iguales` si las cuotas no cuadran.
+10. Descarga PDF, imagen o copia el link del cliente.
 
-## Como usarlo
+## Precios actuales
 
-1. Abre `index.html`.
-2. Llena asesor/a, cliente y datos de financiacion. La razon social, NIT y logo de Avovite ya vienen cargados.
-3. La fecha de validez se coloca sola con la fecha del dia.
-4. Usa `Descuentos actuales` cuando necesites abrir la tabla vigente de precios y descuentos.
-5. El sistema calcula automaticamente total, descuento, ahorro, neto y saldo financiado.
-6. Selecciona `Pagar de contado` para completar el valor total sin cuotas.
-7. Selecciona `Financiado` para ingresar abono inicial y cuotas.
-8. Las cuotas se autorrellenan en valores iguales, pero puedes editar cada valor y fecha.
-9. Puedes agregar o eliminar cuotas hasta maximo 11.
-10. Usa `Calculadoras de apoyo` cuando necesites calcular el porcentaje de descuento desde un valor final o simular una cuota 1 diferente con el resto en cuotas iguales.
-11. Descarga la propuesta en PDF o imagen.
+Abre `Precios actuales` en el menu o usa la URL con `#precios`.
 
-## Para publicarlo en GitHub Pages
+## Administrador
 
-Sube `index.html`, `README.md`, `.nojekyll` y la carpeta `assets/`. No cambies los nombres de la carpeta ni de los archivos internos, porque el HTML depende de esas rutas.
-
-Nombre recomendado del repositorio:
-
-`Plantilla de Simulacion Financiacion`
+Desde `Administrador` se editan precios, categorias, descuentos, asesoras, beneficios y nota. Para publicar cambios en GitHub se necesita un token con permiso de escritura sobre este repositorio.
 
 ## Nota
 
-La razon social fija es AVOVITE S.A.S. y el NIT fijo es 901446849-9.
+La aplicacion no guarda propuestas en servidor. El link del cliente contiene los datos codificados en la URL.

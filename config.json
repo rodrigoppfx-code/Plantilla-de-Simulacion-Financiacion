@@ -1,0 +1,131 @@
+{
+  "updatedAt": 0,
+  "empresa": "AVOVITE S.A.S.",
+  "nit": "901446849-9",
+  "precio": 2580000,
+  "maxCuotas": 8,
+  "topeTotal": 30,
+  "nota": "Los valores quedan sujetos a confirmación de pago y disponibilidad.",
+  "asesoras": [
+    "Paola Acero",
+    "Lizeth Heredia"
+  ],
+  "tiers": [
+    {
+      "nombre": "Vite",
+      "min": 1,
+      "max": 2,
+      "desc": 10,
+      "prod": 10
+    },
+    {
+      "nombre": "Vite Plus",
+      "min": 3,
+      "max": 4,
+      "desc": 15,
+      "prod": 15
+    },
+    {
+      "nombre": "Vite Select",
+      "min": 5,
+      "max": 9,
+      "desc": 20,
+      "prod": 20
+    },
+    {
+      "nombre": "Vite Private",
+      "min": 10,
+      "max": null,
+      "desc": 25,
+      "prod": 25
+    }
+  ],
+  "beneficios": [
+    {
+      "t": "Único pago por 20 años de ingresos",
+      "s": "",
+      "v": [
+        "si",
+        "si",
+        "si",
+        "si"
+      ]
+    },
+    {
+      "t": "Beneficiario para tus Vites",
+      "s": "",
+      "v": [
+        "si",
+        "si",
+        "si",
+        "si"
+      ]
+    },
+    {
+      "t": "Visitas a la finca, acceso a plataforma, documentos, fotos e informes",
+      "s": "",
+      "v": [
+        "si",
+        "si",
+        "si",
+        "si"
+      ]
+    },
+    {
+      "t": "Póliza agrícola para tus Vites",
+      "s": "",
+      "v": [
+        "si",
+        "si",
+        "si",
+        "si"
+      ]
+    },
+    {
+      "t": "Caja sorpresa “De la finca a tu casa”",
+      "s": "",
+      "v": [
+        "-",
+        "1 vez",
+        "1 vez",
+        "1 vez"
+      ]
+    },
+    {
+      "t": "Tour del Aguacate: experiencia inmersiva + acompañante",
+      "s": "",
+      "v": [
+        "-",
+        "-",
+        "1 vez + 1 acompañante",
+        "1 vez + 2 acompañantes"
+      ]
+    },
+    {
+      "t": "Sesión en vivo con directivos Avovite",
+      "s": "",
+      "v": [
+        "-",
+        "-",
+        "si",
+        "si"
+      ]
+    },
+    {
+      "t": "Beneficios exclusivos para clientes Private",
+      "s": "Eventos, charlas, pruebas de productos y mucho más",
+      "v": [
+        "-",
+        "-",
+        "-",
+        "si"
+      ]
+    }
+  ],
+  "github": {
+    "owner": "rodrigoppfx-code",
+    "repo": "Plantilla-de-Simulacion-Financiacion",
+    "branch": "main",
+    "path": "config.json"
+  }
+}
