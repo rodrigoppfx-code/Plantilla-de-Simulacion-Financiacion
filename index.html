@@ -3,17 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preload" as="script" href="./assets/vendor/react-18.3.1.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
-<link rel="preload" as="script" href="./assets/vendor/react-dom-18.3.1.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
-<link rel="preload" as="image" href="./assets/logo.png">
-<script src="./support.js"></script>
+<link rel="stylesheet" href="./assets/fonts/typefaces.2ea1c874bcc5.css">
+<link rel="preload" as="font" type="font/woff2" href="./assets/fonts/figtree.4ba7d3d09669.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="./assets/fonts/newsreader.6e4f2958c3a7.woff2" crossorigin>
+<link rel="preload" as="image" href="./assets/images/logo.1e8a925fd6aa.webp">
+<style>x-dc{display:none!important}</style>
+<script data-config-prefetch>
+window.__avoviteConfigRequest = (async () => {
+  const direct = /^(propuestas-avovite|precios-avovite)\.vercel\.app$/.test(location.hostname || '');
+  const sources = direct ? ['/api/config', 'https://raw.githubusercontent.com/rodrigoppfx-code/Plantilla-de-Simulacion-Financiacion/main/config.json', 'config.json'] : ['config.json'];
+  for (const source of sources) {
+    try {
+      const signal = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined;
+      const serverCache = source === '/api/config';
+      const response = await fetch(serverCache ? source : source + '?t=' + Date.now(), { cache: serverCache ? 'default' : 'no-store', signal });
+      if (response.ok) return await response.json();
+    } catch (error) {}
+  }
+  return null;
+})();
+</script>
+<script defer src="./assets/vendor/app-runtime.2ba0728f9ce1.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
 <title>Propuestas comerciales · Avovite</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
 
 
 <style>
@@ -99,7 +114,7 @@ input,select{font-size:16px !important}
   <header data-r="header" style="position:sticky;top:0;z-index:20;background:rgba(244,242,235,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #E1E3DA">
     <div data-r="hdr" style="max-width:1440px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:12px">
-        <img src="./assets/logo.png" alt="Avovite" style="height:36px;width:auto;display:block">
+        <img src="./assets/images/logo.1e8a925fd6aa.webp" alt="Avovite" style="height:36px;width:auto;display:block">
         <div style="width:1px;height:24px;background:#D6D9CF"></div>
         <div style="font-size:14px;font-weight:600;color:#3F4B42;letter-spacing:0.01em">{{ headerTitle }}</div>
       </div>
@@ -263,7 +278,7 @@ input,select{font-size:16px !important}
         <article data-r="prop" ref="{{ propRef }}" style="background:#FBF8F0;border-radius:4px;box-shadow:0 1px 2px rgba(23,35,26,0.06),0 12px 40px rgba(23,35,26,0.08);width:100%;color:#17231A;font-family:Figtree,system-ui,sans-serif">
 
           <div data-r="p-top" style="padding:36px 40px 22px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
-            <img src="./assets/logo.png" alt="Avovite" style="height:64px;width:auto;display:block">
+            <img src="./assets/images/logo.1e8a925fd6aa.webp" alt="Avovite" style="height:64px;width:auto;display:block">
             <div data-r="p-meta" style="text-align:right;display:flex;flex-direction:column;gap:3px">
               <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:#9A7B34;text-transform:uppercase">Propuesta comercial</div>
               <div style="font-size:14px;font-weight:700;color:#16361F">{{ cfg.empresa }}</div>
@@ -411,7 +426,7 @@ input,select{font-size:16px !important}
           </sc-for>
         </div>
         <div style="padding-top:8px">
-          <h2 style="font-family:Newsreader,serif;font-size:24px;font-weight:500;color:#16361F;margin:0 0 12px">Compara los beneficios</h2>
+          <h2 id="price-benefits" style="font-family:Newsreader,serif;font-size:24px;font-weight:500;color:#16361F;margin:0 0 12px;scroll-margin-top:144px">Compara los beneficios</h2>
           <!-- benefits-table:prices -->
             <div data-scroll="1" style="overflow-x:auto;border:1px solid #E4DECC;border-radius:12px;background:#FBF8F0">
               <div style="min-width:620px;display:grid;grid-template-columns:minmax(200px,1.8fr) repeat(4,minmax(96px,1fr))">
@@ -703,7 +718,7 @@ const benefitsTable = (cfg, selected) => {
     ...cfg.beneficios.map(b => row(b.t, b.s, cfg.tiers.map((_, j) => b.v[j] ?? '-')))
   ] };
 };
-const PUBLIC_PRICES = /\/precios\.html$/i.test(location.pathname || '');
+const PUBLIC_PRICES = location.hostname === 'precios-avovite.vercel.app' || /\/precios\.html$/i.test(location.pathname || '');
 const PUBLIC_PRICES_URL = 'https://precios-avovite.vercel.app/';
 const PROPOSALS_URL = 'https://propuestas-avovite.vercel.app/';
 
@@ -738,15 +753,30 @@ class Component extends DCLogic {
     let local = null, remote = null;
     try { local = JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (e) {}
     const direct = /^(propuestas-avovite|precios-avovite)\.vercel\.app$/.test(location.hostname || '');
-    const sources = direct ? ['https://raw.githubusercontent.com/rodrigoppfx-code/Plantilla-de-Simulacion-Financiacion/main/config.json', 'config.json'] : ['config.json'];
-    for (const source of sources) {
-      try { const signal = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined; const r = await fetch(source + '?t=' + Date.now(), { cache: 'no-store', signal }); if (r.ok) { remote = await r.json(); break; } } catch (e) {}
+    const sources = direct ? ['/api/config', 'https://raw.githubusercontent.com/rodrigoppfx-code/Plantilla-de-Simulacion-Financiacion/main/config.json', 'config.json'] : ['config.json'];
+    if (typeof window !== 'undefined' && window.__avoviteConfigRequest) {
+      remote = await window.__avoviteConfigRequest;
+      window.__avoviteConfigRequest = null;
+    } else {
+      for (const source of sources) {
+        try { const signal = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined; const serverCache = source === '/api/config'; const r = await fetch(serverCache ? source : source + '?t=' + Date.now(), { cache: serverCache ? 'default' : 'no-store', signal }); if (r.ok) { remote = await r.json(); break; } } catch (e) {}
+      }
     }
     const pick = PUBLIC_PRICES ? remote : remote || local;
     if (PUBLIC_PRICES && !pick) { this.setState({ configError: true }); return; }
     if (!pick) return;
     const cfg = { ...clone(DEF), ...pick, github: { ...DEF.github, ...(pick.github || {}) } };
     this.setState(s => ({ cfg, configReady: true, configError: false, f: (s.mode === 'cliente' || this.touched) ? s.f : this.newF(cfg) }));
+  }
+
+  selectPriceTier(name) {
+    this.priceTier = name;
+    this.forceUpdate();
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 640px)').matches) return;
+    window.requestAnimationFrame(() => {
+      const heading = document.getElementById('price-benefits');
+      if (heading) heading.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    });
   }
 
   setF(patch) { this.touched = true; this.setState(s => ({ f: { ...s.f, ...(['q','d','x','auth'].some(k => k in patch) ? { exact: null } : {}), ...patch } })); }
@@ -846,7 +876,7 @@ class Component extends DCLogic {
   }
 
   async capture() {
-    await this.loadExportLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+    await this.loadExportLibrary('html2canvas', './assets/vendor/html2canvas.min.js');
     const el = this.propRef.current; if (!el) throw new Error('no-proposal');
     const prevW = el.style.width, prevMax = el.style.maxWidth;
     const sc = el.querySelectorAll('[data-scroll]');
@@ -866,8 +896,8 @@ class Component extends DCLogic {
     this.setState({ busy: 'pdf' });
     try {
       await Promise.all([
-        this.loadExportLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'),
-        this.loadExportLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js')
+        this.loadExportLibrary('html2canvas', './assets/vendor/html2canvas.min.js'),
+        this.loadExportLibrary('jspdf', './assets/vendor/jspdf.umd.min.js')
       ]);
       const c = await this.capture(); const w = c.width / 2, h = c.height / 2;
       const { jsPDF } = window.jspdf;
@@ -1014,7 +1044,7 @@ class Component extends DCLogic {
     const pr = {
       benefits: benefitsTable(cfg, priceIndex),
       unitStr: money(cfg.precio), ups,
-      tiers: cfg.tiers.map((x, j) => ({ ac: pal(x).ac, bg: j === priceIndex ? '#E8EEDD' : '#fff', bd: j === priceIndex ? '#1F4D2B' : '#E1E3DA', selected: j === priceIndex, selectLabel: `Seleccionar ${x.nombre}`, select: () => { this.priceTier = x.nombre; this.forceUpdate(); }, nombre: x.nombre, range: rangeOf(x), desc: x.desc, unitStr: money(cfg.precio), netStr: money(cfg.precio - Math.round(cfg.precio * x.desc / 100)), saveStr: money(cfg.precio * x.desc / 100) })),
+      tiers: cfg.tiers.map((x, j) => ({ ac: pal(x).ac, bg: j === priceIndex ? '#E8EEDD' : '#fff', bd: j === priceIndex ? '#1F4D2B' : '#E1E3DA', selected: j === priceIndex, selectLabel: `Seleccionar ${x.nombre}`, select: () => this.selectPriceTier(x.nombre), nombre: x.nombre, range: rangeOf(x), desc: x.desc, unitStr: money(cfg.precio), netStr: money(cfg.precio - Math.round(cfg.precio * x.desc / 100)), saveStr: money(cfg.precio * x.desc / 100) })),
       rows: Array.from({ length: 12 }, (_, i) => { const q = i + 1, x = tierFor(cfg, q), sub = q * cfg.precio, sv = Math.round(sub * x.desc / 100); return { q, tier: x.nombre, sub: money(sub), pct: x.desc, net: money(sub - sv), save: money(sv), bg: cfg.tiers.indexOf(x) === priceIndex ? '#E8EEDD' : '#fff', bd: (q > 1 && tierFor(cfg, q - 1) !== x) ? '#C9CFC0' : '#EEF0EA', ac: pal(x).ac }; })
     };
     return {

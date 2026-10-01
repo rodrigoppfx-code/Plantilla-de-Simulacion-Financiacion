@@ -2,14 +2,16 @@
 
 Aplicacion estatica para crear propuestas comerciales de Avovite.
 
-Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `https://precios-avovite.vercel.app/` para precios publicos. Vercel sirve directamente los archivos estaticos para reducir la espera. Ambas consultan el mismo `config.json` de GitHub para mantener los precios y beneficios del administrador actualizados. Los enlaces anteriores siguen funcionando. Los cambios de codigo se publican en GitHub y en ambos proyectos de Vercel usando `work/deploy-public-prices.ps1`.
+Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `https://precios-avovite.vercel.app/` para precios publicos. Vercel sirve directamente los archivos estaticos para reducir la espera. Ambas consultan el mismo `config.json` de GitHub mediante `api/config.js`, con una cache de servidor de 15 segundos y sin cache en el navegador. Si el servicio falla, se consulta directamente la fuente original. Los enlaces anteriores siguen funcionando. Los cambios de codigo se publican en GitHub y en ambos proyectos de Vercel usando `work/deploy-public-prices.ps1`.
 
 ## Archivos principales
 
 - `index.html`: aplicacion completa para asesoras, clientes, precios actuales y administrador.
-- `support.js`: runtime requerido por `index.html`.
+- `support.js`: fuente del runtime, agrupada con React en el archivo versionado de `assets/loading-manifest.json`.
 - `config.json`: precios, categorias, descuentos, asesoras, beneficios y nota.
-- `assets/logo.png`: logo comprimido sin alterar sus pixeles, compartido por las vistas y descargas.
+- `assets/logo.png`: respaldo PNG del logo. Las vistas y descargas usan el WebP sin perdida de `assets/images/`, con pixeles identicos.
+- `assets/fonts/`: las mismas tipografias Figtree y Newsreader, alojadas localmente.
+- `assets/loading-manifest.json`: recursos versionados para la carga y el despliegue. `work/build-loading-assets.cjs` genera el paquete de arranque sin cambiar versiones ni logica.
 - `legacy/`: respaldo de la version anterior publicada.
 
 ## Uso
@@ -27,6 +29,8 @@ Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `ht
 
 - `#precios`: abre la tabla de precios actuales.
 - `#p=<datos>`: abre una propuesta para cliente desde un link codificado.
+
+En celular, al seleccionar una categoria en precios, la pagina baja hasta `Compara los beneficios`. En escritorio se mantiene la posicion. La preferencia de movimiento reducido se respeta.
 
 ## Configuracion
 
