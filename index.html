@@ -34,7 +34,7 @@ input[type=checkbox]{accent-color:#1F4D2B}
       </div>
       <sc-if value="{{ notCliente }}" hint-placeholder-val="{{ true }}">
         <nav style="display:flex;flex-wrap:wrap;gap:4px;background:#E9EBE2;padding:4px;border-radius:12px">
-          <button onClick="{{ goAsesora }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabA.bg }};color:{{ tabA.fg }};box-shadow:{{ tabA.sh }}">Nueva propuesta</button>
+          <button onClick="{{ resetAll }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabA.bg }};color:{{ tabA.fg }};box-shadow:{{ tabA.sh }}">Nueva propuesta</button>
           <button onClick="{{ goPrecios }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabP.bg }};color:{{ tabP.fg }};box-shadow:{{ tabP.sh }}">Precios actuales</button>
           <button onClick="{{ goAdmin }}" style="border:0;cursor:pointer;height:36px;padding:0 16px;border-radius:9px;font-size:14px;font-weight:600;background:{{ tabB.bg }};color:{{ tabB.fg }};box-shadow:{{ tabB.sh }}">Administrador</button>
         </nav>
@@ -122,11 +122,11 @@ input[type=checkbox]{accent-color:#1F4D2B}
           <sc-if value="{{ p.fin }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Abono inicial (hoy)
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Abono inicial
                   <input value="{{ p.abonoIn }}" onChange="{{ on.abono }}" inputMode="numeric" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:600;color:#17231A;background:#fff;width:100%;outline:none" style-focus="border-color:#2E6B3A;box-shadow:0 0 0 3px #E3EDDF">
                 </label>
-                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Primera cuota
-                  <input type="date" value="{{ f.first }}" onChange="{{ on.first }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none">
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Fecha del abono inicial
+                  <input type="date" value="{{ p.abonoDate }}" onChange="{{ on.abonoDate }}" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px;font-weight:500;color:#17231A;background:#fff;width:100%;outline:none">
                 </label>
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
@@ -163,8 +163,7 @@ input[type=checkbox]{accent-color:#1F4D2B}
             <button onClick="{{ copyLink }}" style="height:44px;border:1px solid #CBD1C4;border-radius:12px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Copiar link</button>
           </div>
           <div style="display:flex;justify-content:space-between;gap:8px;padding-top:4px">
-            <button onClick="{{ openClient }}" style="border:0;background:none;color:#4A564D;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Ver como cliente</button>
-            <button onClick="{{ resetAll }}" style="border:0;background:none;color:#4A564D;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Nueva propuesta</button>
+            <button onClick="{{ resetAll }}" style="width:100%;min-height:44px;border:1px solid #CBD1C4;border-radius:8px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer;padding:10px 16px">Nueva propuesta</button>
           </div>
         </div>
       </section>
@@ -583,7 +582,8 @@ class Component extends DCLogic {
 
   newF(cfg) {
     const t = tierFor(cfg, 1);
-    return { id: genId(), date: todayIso(), nombre: '', cel: '', mail: '', asesora: cfg.asesoras[0] || '', q: 1, d: t.desc, auth: false, x: 0, modo: 'contado', abono: 0, n: 4, first: addMonths(todayIso(), 1) };
+    const date = todayIso();
+    return { id: genId(), date, abonoDate: date, nombre: '', cel: '', mail: '', asesora: cfg.asesoras[0] || '', q: 1, d: t.desc, auth: false, x: 0, modo: 'contado', abono: 0, n: 4 };
   }
 
   demoF(cfg) {
@@ -637,12 +637,12 @@ class Component extends DCLogic {
       if (client && f.cuotas) cuotas = f.cuotas.map(([v, dt]) => ({ v, d: dt }));
       else {
         const n = clamp(f.n, 1, cfg.maxCuotas);
-        const sig = [total, abono, n, f.first].join('|');
+        const sig = [total, abono, n].join('|');
         if (sig !== this.sig) { this.sig = sig; this.ov = {}; }
         const base = Math.floor(saldo / n / 1000) * 1000;
         for (let i = 0; i < n; i++) {
           const o = this.ov[i] || {};
-          cuotas.push({ v: o.v != null ? o.v : (i === n - 1 ? saldo - base * (n - 1) : base), d: o.d || addMonths(f.first, i) });
+          cuotas.push({ v: o.v != null ? o.v : (i === n - 1 ? saldo - base * (n - 1) : base), d: o.d || addMonths(f.abonoDate || f.date, i + 1) });
         }
       }
     }
@@ -731,13 +731,17 @@ class Component extends DCLogic {
       auth: e => this.setF({ auth: e.target.checked, x: e.target.checked ? f.x : 0 }),
       x: e => this.setF({ x: clamp(digits(e.target.value), 0, c.xMax) }),
       abono: e => this.setF({ abono: clamp(digits(e.target.value), 0, c.total) }),
-      first: e => this.setF({ first: e.target.value || f.first })
+      abonoDate: e => {
+        if (!e.target.value) return;
+        this.ov = Object.fromEntries(Object.entries(this.ov).map(([i, o]) => [i, { v: o.v }]));
+        this.setF({ abonoDate: e.target.value });
+      }
     };
     this.setQ = q => { q = clamp(q, 1, 999); const nt = tierFor(cfg, q); const patch = { q }; if (nt !== tierFor(cfg, this.state.f.q)) patch.d = nt.desc; this.setF(patch); };
 
     const pay = !c.fin
       ? [{ label: 'Pago de contado', date: fDate(f.date), amount: money(c.total) }]
-      : [{ label: 'Abono inicial', date: fDate(f.date), amount: money(c.abono) }].concat(c.cuotas.map((q, i) => ({ label: `Cuota ${i + 1} de ${c.cuotas.length}`, date: fDate(q.d), amount: money(q.v) })));
+      : [{ label: 'Abono inicial', date: fDate(f.abonoDate || f.date), amount: money(c.abono) }].concat(c.cuotas.map((q, i) => ({ label: `Cuota ${i + 1} de ${c.cuotas.length}`, date: fDate(q.d), amount: money(q.v) })));
     const sumC = c.cuotas.reduce((a, q) => a + (q.v || 0), 0), diff = c.saldo - sumC;
 
     const heads = cfg.tiers.map((x, j) => ({ name: x.nombre, tag: j === ti ? 'Tu categoría' : '', bg: j === ti ? '#1F4D2B' : '#F2ECDC', fg: j === ti ? '#fff' : '#1F4D2B' }));
@@ -760,7 +764,7 @@ class Component extends DCLogic {
       tierName: t.nombre, tierRange: rangeOf(t), tierMax: t.desc, d: c.d, x: c.x, xMax: c.xMax,
       hasD: c.d > 0, hasX: f.auth && c.x > 0, dvStr: money(c.dv), xvStr: money(c.xv),
       totalStr: money(c.total), hasSave: totPct > 0, saveStr: money(c.dv + c.xv), totPct,
-      fin: c.fin, abonoIn: c.abono ? money(c.abono) : '', saldoStr: money(c.saldo),
+      fin: c.fin, abonoIn: c.abono ? money(c.abono) : '', abonoDate: f.abonoDate || f.date, saldoStr: money(c.saldo),
       planNote: c.fin ? `${c.cuotas.length} ${c.cuotas.length === 1 ? 'cuota' : 'cuotas'} sin intereses` : 'Pago único',
       pay, hasDiff: c.fin && diff !== 0, diffMsg: diff > 0 ? `Faltan ${money(diff)} por asignar en las cuotas.` : `Las cuotas superan el saldo por ${money(-diff)}.`,
       nota: String(cfg.nota || '').replace(/^Propuesta válida[^.]*\.\s*/i, ''),
@@ -847,8 +851,7 @@ class Component extends DCLogic {
       closeLink: () => this.setState({ link: null }), stop: e => e.stopPropagation(), selectAll: e => e.target.select(),
       doCopy: async () => { const ok = await this.copyText(this.state.link.url); this.setState(s => ({ link: { ...s.link, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'No se pudo copiar automáticamente: mantén presionado el link y elige Copiar.' } })); },
       doOpen: () => window.open(this.state.link.url, '_blank'),
-      openClient: () => window.open(this.linkFor(c), '_blank'),
-      resetAll: () => { this.touched = false; this.ov = {}; this.setState({ f: this.newF(cfg) }); },
+      resetAll: () => { history.replaceState(null, '', location.pathname + location.search); location.reload(); },
       propRef: this.propRef,
       pass: this.state.pass, passErr: this.state.passErr,
       onPass: e => this.setState({ pass: e.target.value, passErr: false }),

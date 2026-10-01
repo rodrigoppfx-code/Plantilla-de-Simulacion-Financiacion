@@ -9,9 +9,10 @@
 5. Cambia la cantidad de Vites. La categoria y el descuento maximo se ajustan solos.
 6. Si hay descuento adicional autorizado, activa la casilla y escribe el porcentaje extra permitido.
 7. Elige pago de contado o financiado.
-8. Si es financiado, revisa abono, numero de cuotas, valores y fechas.
+8. Si es financiado, ingresa el abono inicial y su fecha (hoy por defecto). La cuota 1 se programa un mes despues y las siguientes mes a mes. Puedes editar valores y fechas de cada cuota.
 9. Usa `Repartir en partes iguales` si las cuotas no cuadran.
 10. Descarga PDF, imagen o copia el link del cliente.
+11. Pulsa `Nueva propuesta` para recargar la pagina, limpiar el formulario y traer la configuracion vigente.
 
 ## Precios actuales
 
