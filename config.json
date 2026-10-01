@@ -1,5 +1,4 @@
 {
-  "updatedAt": 0,
   "empresa": "AVOVITE S.A.S.",
   "nit": "901446849-9",
   "precio": 2580000,
@@ -127,5 +126,6 @@
     "repo": "Plantilla-de-Simulacion-Financiacion",
     "branch": "main",
     "path": "config.json"
-  }
+  },
+  "updatedAt": 1790817913692
 }
