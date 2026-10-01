@@ -634,6 +634,7 @@ const benefitsTable = (cfg, selected) => {
 };
 const PUBLIC_PRICES = /\/precios\.html$/i.test(location.pathname || '');
 const PUBLIC_PRICES_URL = 'https://precios-avovite.vercel.app/';
+const PROPOSALS_URL = 'https://propuestas-avovite.vercel.app/';
 
 class Component extends DCLogic {
   state = { mode: PUBLIC_PRICES ? 'precios' : 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', link: null, savePrompt: false, savePass: '', saveError: '', saving: false, configReady: !PUBLIC_PRICES, configError: false };
@@ -749,7 +750,7 @@ class Component extends DCLogic {
     if (net != null && (!Number.isSafeInteger(net) || net < 0 || net > c.sub)) error = 'El valor final debe estar entre $0 y el valor bruto.';
     return { net, rate, error };
   }
-  linkFor(c) { return location.href.split('#')[0] + '#p=' + enc(JSON.stringify(this.payload(c))); }
+  linkFor(c) { return PROPOSALS_URL + '#p=' + enc(JSON.stringify(this.payload(c))); }
 
   async capture() {
     const el = this.propRef.current; if (!el || !window.html2canvas) throw new Error('no-lib');
