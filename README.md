@@ -37,6 +37,10 @@ En celular, al seleccionar una categoria en precios, la pagina baja hasta `Compa
 El administrador edita `config.json` desde la misma aplicacion. `Guardar cambios` pide la misma clave de acceso y publica para todas las asesoras mediante el servicio `https://avovite-propuestas-admin.vercel.app/api/settings`. No se ingresan tokens en la aplicacion. Las credenciales de publicacion y la verificacion de clave quedan en el servicio, fuera del HTML.
 # Pagina publica de precios y beneficios
 
+El dominio publico sirve HTML completo desde `api/prices.js`, generado con `lib/public-prices.cjs`. Los precios se ven antes de ejecutar JavaScript y no requieren React ni una segunda consulta del navegador. La seleccion de categorias conserva el mismo comportamiento.
+
+`work/build-public-renderer.cjs` extrae la plantilla, estilos y calculos de `index.html`; regenerar este archivo antes de desplegar cambios visuales o de calculo. El servidor lee el mismo `config.json` del administrador, con cache breve y actualizacion dentro del intervalo de 1 a 2 minutos anunciado al guardar. GitHub Pages mantiene la pagina compatible anterior.
+
 `precios.html` muestra los precios y la tabla de beneficios sin navegacion al simulador ni al administrador. Lee el mismo `config.json` remoto al abrir o actualizar la pagina. Si no puede cargarlo, ofrece reintentar en lugar de mostrar precios locales desactualizados.
 
 Al seleccionar una tarjeta se resaltan su columna de beneficios, sus filas de precios y el salto desde esa categoria hacia la siguiente. Vite Private no tiene un salto posterior. La seleccion es solo visual y no modifica propuestas, cuotas ni descuentos.
