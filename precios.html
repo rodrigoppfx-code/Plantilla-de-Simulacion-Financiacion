@@ -628,9 +628,8 @@ const benefitsTable = (cfg, selected) => {
   }) });
   return { heads, rows: [
     row('Cantidad de Vites', '', cfg.tiers.map(rangeOf)),
-    row('Compra de tus Vites', '', cfg.tiers.map(x => `Hasta ${x.desc}%`)),
-    ...cfg.beneficios.map(b => row(b.t, b.s, cfg.tiers.map((_, j) => b.v[j] ?? '-'))),
-    row('Descuentos en productos Avovite', '', cfg.tiers.map(x => `Hasta ${x.prod}%`))
+    row('Descuentos en productos Avovite y compra de tus Vites', '', cfg.tiers.map(x => x.desc === x.prod ? `Hasta ${x.desc}%` : `Productos: hasta ${x.prod}% · Compra: hasta ${x.desc}%`)),
+    ...cfg.beneficios.map(b => row(b.t, b.s, cfg.tiers.map((_, j) => b.v[j] ?? '-')))
   ] };
 };
 const PUBLIC_PRICES = /\/precios\.html$/i.test(location.pathname || '');
