@@ -2,14 +2,14 @@
 
 Aplicacion estatica para crear propuestas comerciales de Avovite.
 
-Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `https://precios-avovite.vercel.app/` para precios publicos. Ambas muestran la fuente de GitHub Pages mediante reglas de Vercel, sin duplicar datos ni diseno. Los enlaces anteriores siguen funcionando.
+Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `https://precios-avovite.vercel.app/` para precios publicos. Vercel sirve directamente los archivos estaticos para reducir la espera. Ambas consultan el mismo `config.json` de GitHub para mantener los precios y beneficios del administrador actualizados. Los enlaces anteriores siguen funcionando. Los cambios de codigo se publican en GitHub y en ambos proyectos de Vercel usando `work/deploy-public-prices.ps1`.
 
 ## Archivos principales
 
 - `index.html`: aplicacion completa para asesoras, clientes, precios actuales y administrador.
 - `support.js`: runtime requerido por `index.html`.
 - `config.json`: precios, categorias, descuentos, asesoras, beneficios y nota.
-- `assets/logo.png`: original del logo; el HTML tambien lo incorpora para las vistas y descargas.
+- `assets/logo.png`: logo comprimido sin alterar sus pixeles, compartido por las vistas y descargas.
 - `legacy/`: respaldo de la version anterior publicada.
 
 ## Uso

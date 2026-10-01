@@ -1,14 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/index.html" },
-    { "source": "/precios.html", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/precios.html" },
-    { "source": "/support.js", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/support.js" },
+    { "source": "/", "destination": "/index.html" },
     { "source": "/config.json", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/config.json" }
   ],
   "headers": [
-    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
-    { "source": "/precios.html", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/precios.html", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "source": "/assets/vendor/:path*", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
     { "source": "/config.json", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
   ]
 }
