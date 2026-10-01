@@ -42,7 +42,7 @@
   ],
   "beneficios": [
     {
-      "t": "Único pago por 20 años de ingresos",
+      "t": "Único pago por 20 años de ingresos en automático",
       "s": "",
       "v": [
         "si",
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "t": "Beneficiario para tus Vites",
+      "t": "Beneficiario para tus Vites sin costo",
       "s": "",
       "v": [
         "si",
@@ -128,5 +128,5 @@
     "branch": "main",
     "path": "config.json"
   },
-  "updatedAt": 1790818464749
+  "updatedAt": 1790883060130
 }
