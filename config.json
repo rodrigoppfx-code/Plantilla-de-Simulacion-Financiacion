@@ -2,12 +2,13 @@
   "empresa": "AVOVITE S.A.S.",
   "nit": "901446849-9",
   "precio": 2580000,
-  "maxCuotas": 8,
+  "maxCuotas": 10,
   "topeTotal": 30,
   "nota": "Los valores quedan sujetos a confirmación de pago y disponibilidad.",
   "asesoras": [
     "Paola Acero",
-    "Lizeth Heredia"
+    "Lizeth Heredia",
+    "Rodrigo"
   ],
   "tiers": [
     {
@@ -127,5 +128,5 @@
     "branch": "main",
     "path": "config.json"
   },
-  "updatedAt": 1790818314707
+  "updatedAt": 1790818464749
 }
