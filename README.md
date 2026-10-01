@@ -16,10 +16,12 @@ Aplicacion estatica para crear propuestas comerciales de Avovite.
 2. Llena los datos del cliente y selecciona asesora.
 3. Ajusta cantidad de Vites. La categoria y el descuento maximo se calculan solos.
 4. Elige pago de contado o financiado.
-5. Revisa cuotas, fechas y avisos de diferencia.
+5. Revisa cuotas y fechas. Las cuotas editadas mantienen su valor; las demas se recalculan automaticamente con el saldo restante. Desmarca un valor para liberarlo o pulsa `Repartir todo por igual`.
 6. Descarga PDF, imagen o copia el link para el cliente.
 
 ## Vistas
+
+La calculadora desplegable de descuento usa el valor final total y conserva el neto exacto al aplicar, sin redondearlo a partir del porcentaje mostrado. Respeta los descuentos autorizados. No aparece en la propuesta del cliente.
 
 - `#precios`: abre la tabla de precios actuales.
 - `#p=<datos>`: abre una propuesta para cliente desde un link codificado.

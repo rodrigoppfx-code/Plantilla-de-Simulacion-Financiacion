@@ -10,11 +10,15 @@
 6. Si hay descuento adicional autorizado, activa la casilla y escribe el porcentaje extra permitido.
 7. Elige pago de contado o financiado.
 8. Si es financiado, ingresa el abono inicial y su fecha (hoy por defecto). La cuota 1 se programa un mes despues y las siguientes mes a mes. Puedes editar valores y fechas de cada cuota.
-9. Usa `Repartir en partes iguales` si las cuotas no cuadran.
+9. Al editar una cuota, su valor queda marcado para mantenerse. El saldo restante se reparte automaticamente entre las cuotas sin marcar, incluso al cambiar precio, abono o numero de cuotas. Desmarca una cuota para liberarla. `Repartir todo por igual` libera todos los valores sin cambiar las fechas. Si los valores fijados superan el saldo o no quedan cuotas libres, revisa el aviso de diferencia.
 10. Descarga PDF, imagen o copia el link del cliente.
 11. Pulsa `Nueva propuesta` para recargar la pagina, limpiar el formulario y traer la configuracion vigente.
 
 ## Precios actuales
+
+## Calculadora de descuento
+
+Abre `Calcular descuento desde el precio final`. Toma la cantidad y precio vigentes de la propuesta. Ingresa el valor final TOTAL, no el valor por Vite. Muestra porcentaje equivalente y ahorro. `Aplicar descuento` conserva ese valor exacto y respeta los topes de categoria y descuento adicional autorizado. Cambiar cantidad, precio o descuento recalcula la propuesta con los datos nuevos.
 
 Abre `Precios actuales` en el menu o usa la URL con `#precios`.
 

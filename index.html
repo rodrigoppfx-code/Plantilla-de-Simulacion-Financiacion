@@ -92,7 +92,7 @@ input[type=checkbox]{accent-color:#1F4D2B}
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Descuento de compra</span><span style="font-size:12px;color:#6A756C">Máximo {{ p.tierMax }}% para {{ p.tierName }}</span></div>
             <div style="display:flex;align-items:center;gap:12px">
-              <input type="range" min="0" max="{{ p.tierMax }}" step="1" value="{{ p.d }}" onChange="{{ on.d }}" style="flex:1;height:28px">
+              <input type="range" min="0" max="{{ p.tierMax }}" step="0.01" value="{{ p.dRange }}" onChange="{{ on.d }}" style="flex:1;height:28px">
               <div style="display:flex;align-items:center;border:1px solid #D6DBD0;border-radius:10px;height:44px;padding:0 10px;gap:2px;width:80px"><input value="{{ p.d }}" onChange="{{ on.d }}" inputMode="numeric" style="width:100%;border:0;font-size:16px;font-weight:700;text-align:right;outline:none;color:#17231A"><span style="font-weight:600;color:#6A756C">%</span></div>
             </div>
           </div>
@@ -105,7 +105,7 @@ input[type=checkbox]{accent-color:#1F4D2B}
             <div style="display:flex;flex-direction:column;gap:8px;padding:0 4px">
               <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Descuento adicional</span><span style="font-size:12px;color:#6A756C">Hasta {{ p.xMax }}% (tope total {{ cfg.topeTotal }}%)</span></div>
               <div style="display:flex;align-items:center;gap:12px">
-                <input type="range" min="0" max="{{ p.xMax }}" step="1" value="{{ p.x }}" onChange="{{ on.x }}" style="flex:1;height:28px">
+                <input type="range" min="0" max="{{ p.xRangeMax }}" step="0.01" value="{{ p.xRange }}" onChange="{{ on.x }}" style="flex:1;height:28px">
                 <div style="display:flex;align-items:center;border:1px solid #D6DBD0;border-radius:10px;height:44px;padding:0 10px;gap:2px;width:80px"><input value="{{ p.x }}" onChange="{{ on.x }}" inputMode="numeric" style="width:100%;border:0;font-size:16px;font-weight:700;text-align:right;outline:none;color:#17231A"><span style="font-weight:600;color:#6A756C">%</span></div>
               </div>
               <div style="font-size:12px;color:#6A756C">Aparece en la propuesta como “Beneficio adicional autorizado”.</div>
@@ -113,6 +113,17 @@ input[type=checkbox]{accent-color:#1F4D2B}
           </sc-if>
         </div>
 
+        <details style="background:#fff;border:1px solid #E1E3DA;border-radius:12px;padding:16px 20px">
+          <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#1F4D2B">Calcular descuento desde el precio final</summary>
+          <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px">
+            <div style="font-size:13px;color:#5F6B62">{{ p.q }} Vites × {{ p.unitStr }} = {{ p.subStr }}</div>
+            <label style="font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:6px">Valor final total para el cliente
+              <input aria-label="Valor final total para el cliente" value="{{ calc.value }}" onChange="{{ calc.change }}" inputMode="numeric" style="width:100%;height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px">
+            </label>
+            <div style="font-size:13px;color:#4A564D" role="status">{{ calc.result }}</div>
+            <button disabled="{{ calc.invalid }}" onClick="{{ calc.apply }}" style="width:100%;min-height:40px;border:1px solid #D6DBD0;border-radius:8px;background:#EEF0E9;color:#1F4D2B;font-weight:600;cursor:pointer">Aplicar descuento</button>
+          </div>
+        </details>
         <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
           <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">3</span><span style="font-size:15px;font-weight:700">Forma de pago</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#EEF0E9;padding:4px;border-radius:12px">
@@ -139,10 +150,11 @@ input[type=checkbox]{accent-color:#1F4D2B}
               </div>
               <div style="display:flex;justify-content:space-between;font-size:14px;color:#4A564D;padding:10px 12px;background:#F6F7F3;border-radius:10px"><span>Saldo a financiar</span><span style="font-weight:700;color:#17231A">{{ p.saldoStr }}</span></div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Cuotas</span><button onClick="{{ resetCuotas }}" style="border:0;background:none;color:#1F4D2B;font-size:12px;font-weight:600;cursor:pointer;padding:4px 0">Repartir en partes iguales</button></div>
+                <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#4A564D">Cuotas</span><button onClick="{{ resetCuotas }}" style="border:0;background:none;color:#1F4D2B;font-size:12px;font-weight:600;cursor:pointer;padding:4px 0">Repartir todo por igual</button></div>
+                <div style="font-size:12px;color:#6A756C">{{ distributionNote }}</div>
                 <sc-for list="{{ cuotaEd }}" as="c" hint-placeholder-count="4">
                   <div style="display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center">
-                    <span style="font-size:13px;font-weight:700;color:#6A756C">{{ c.n }}</span>
+                    <label title="Mantener el valor de esta cuota" style="font-size:12px;font-weight:700;color:#6A756C;display:flex;flex-direction:column;align-items:center;gap:3px">{{ c.n }}<input type="checkbox" aria-label="{{ c.lockLabel }}" checked="{{ c.fixed }}" onChange="{{ c.onLock }}" style="width:16px;height:16px"></label>
                     <input value="{{ c.vStr }}" onChange="{{ c.onV }}" inputMode="numeric" style="height:40px;padding:0 10px;border:1px solid #D6DBD0;border-radius:9px;font-size:14px;font-weight:600;color:#17231A;width:100%;outline:none">
                     <input type="date" value="{{ c.d }}" onChange="{{ c.onD }}" style="height:40px;padding:0 8px;border:1px solid #D6DBD0;border-radius:9px;font-size:13px;color:#17231A;width:100%;outline:none">
                   </div>
@@ -566,6 +578,8 @@ const fLong = s => cap(parseIso(s).toLocaleDateString('es-CO', { weekday: 'long'
 const fDate = s => parseIso(s).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 const money = n => '$' + Math.round(n || 0).toLocaleString('es-CO');
 const digits = v => Number(String(v).replace(/\D/g, '')) || 0;
+const percent = v => Number(String(v).replace(',', '.')) || 0;
+const pct = v => Number(v.toFixed(2)).toLocaleString('es-CO');
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const enc = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const dec = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
@@ -578,7 +592,7 @@ const isNo = v => /^(-|–|no|)$/i.test(String(v).trim());
 class Component extends DCLogic {
   state = { mode: 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', link: null, savePrompt: false, savePass: '', saveError: '', saving: false };
   propRef = React.createRef();
-  ov = {}; sig = '';
+  ov = {}; sig = ''; calcNet = null;
 
   newF(cfg) {
     const t = tierFor(cfg, 1);
@@ -610,7 +624,7 @@ class Component extends DCLogic {
     this.setState(s => ({ cfg, f: (s.mode === 'cliente' || this.touched) ? s.f : this.newF(cfg) }));
   }
 
-  setF(patch) { this.touched = true; this.setState(s => ({ f: { ...s.f, ...patch } })); }
+  setF(patch) { this.touched = true; this.setState(s => ({ f: { ...s.f, ...(['q','d','x','auth'].some(k => k in patch) ? { exact: null } : {}), ...patch } })); }
   async copyText(t) {
     try { await navigator.clipboard.writeText(t); return true; } catch (e) {}
     try { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; }
@@ -629,7 +643,15 @@ class Component extends DCLogic {
     const d = client ? f.d : clamp(f.d, 0, t.desc);
     const xMax = Math.max(0, (cfg.topeTotal || 0) - d);
     const x = f.auth ? (client ? f.x : clamp(f.x, 0, xMax)) : 0;
-    const sub = f.q * unit, dv = Math.round(sub * d / 100), xv = Math.round(sub * x / 100), total = sub - dv - xv;
+    const sub = f.q * unit;
+    let dv = Math.round(sub * d / 100), xv = Math.round(sub * x / 100);
+    // The agreed net amount is authoritative; the displayed percentage is only a summary.
+    const exact = f.exact;
+    if (exact && exact.sub === sub && exact.d === d && exact.x === x && exact.auth === f.auth && Number.isSafeInteger(exact.net) && exact.net >= 0 && exact.net <= sub && exact.net >= Math.ceil(sub * (1 - (d + x) / 100) - 0.000001)) {
+      if (x > 0) xv = sub - exact.net - dv;
+      else dv = sub - exact.net;
+    }
+    const total = sub - dv - xv;
     const fin = f.modo === 'financiado';
     let abono = 0, saldo = 0, cuotas = [];
     if (fin) {
@@ -637,12 +659,15 @@ class Component extends DCLogic {
       if (client && f.cuotas) cuotas = f.cuotas.map(([v, dt]) => ({ v, d: dt }));
       else {
         const n = clamp(f.n, 1, cfg.maxCuotas);
-        const sig = [total, abono, n].join('|');
-        if (sig !== this.sig) { this.sig = sig; this.ov = {}; }
-        const base = Math.floor(saldo / n / 1000) * 1000;
+        this.ov = Object.fromEntries(Object.entries(this.ov).filter(([i]) => Number(i) < n));
+        const fixed = Object.values(this.ov).reduce((sum, o) => sum + (o.v ?? 0), 0);
+        const open = n - Object.values(this.ov).filter(o => o.v != null).length;
+        const rest = Math.max(0, saldo - fixed);
+        const base = open ? Math.floor(rest / open) : 0, residue = open ? rest % open : 0;
+        let j = 0;
         for (let i = 0; i < n; i++) {
           const o = this.ov[i] || {};
-          cuotas.push({ v: o.v != null ? o.v : (i === n - 1 ? saldo - base * (n - 1) : base), d: o.d || addMonths(f.abonoDate || f.date, i + 1) });
+          cuotas.push({ v: o.v != null ? o.v : base + (j++ < residue ? 1 : 0), d: o.d || addMonths(f.abonoDate || f.date, i + 1) });
         }
       }
     }
@@ -652,6 +677,20 @@ class Component extends DCLogic {
   payload(c) {
     const { f } = this.state;
     return { ...f, unit: c.unit, d: c.d, x: c.x, abono: c.abono, cuotas: c.fin ? c.cuotas.map(q => [q.v, q.d]) : null };
+  }
+  discountCalc(c = this.compute()) {
+    const net = this.calcNet, rate = c.sub ? (c.sub - net) * 100 / c.sub : 0;
+    const limit = this.state.f.auth ? this.state.cfg.topeTotal : c.t.desc;
+    let error = net == null ? 'Ingresa el valor final total.' : '';
+    if (net != null && (!Number.isSafeInteger(net) || net < 0 || net > c.sub)) error = 'El valor final debe estar entre $0 y el valor bruto.';
+    else if (net != null && rate > limit + 1e-9) error = `El descuento supera el ${limit}% permitido${this.state.f.auth ? '.' : '; requiere autorizar el descuento adicional.'}`;
+    return { net, rate, error };
+  }
+  applyDiscount() {
+    const c = this.compute(), r = this.discountCalc(c);
+    if (r.error) return;
+    const d = Math.min(r.rate, c.t.desc), x = Math.max(0, r.rate - d);
+    this.setF({ d, x, exact: { net: r.net, sub: c.sub, d, x, auth: this.state.f.auth } });
   }
   linkFor(c) { return location.href.split('#')[0] + '#p=' + enc(JSON.stringify(this.payload(c))); }
 
@@ -727,9 +766,9 @@ class Component extends DCLogic {
       mail: e => this.setF({ mail: e.target.value }),
       asesora: e => this.setF({ asesora: e.target.value }),
       q: e => this.setQ(digits(e.target.value) || 1),
-      d: e => this.setF({ d: clamp(digits(e.target.value), 0, t.desc) }),
+      d: e => this.setF({ d: clamp(percent(e.target.value), 0, t.desc) }),
       auth: e => this.setF({ auth: e.target.checked, x: e.target.checked ? f.x : 0 }),
-      x: e => this.setF({ x: clamp(digits(e.target.value), 0, c.xMax) }),
+      x: e => this.setF({ x: clamp(percent(e.target.value), 0, c.xMax) }),
       abono: e => this.setF({ abono: clamp(digits(e.target.value), 0, c.total) }),
       abonoDate: e => {
         if (!e.target.value) return;
@@ -761,9 +800,9 @@ class Component extends DCLogic {
       id: f.id, dateLong: fLong(f.date), nombre: f.nombre.trim() || 'Nombre del cliente',
       contact: [f.cel, f.mail].filter(Boolean).join('  ·  ') || ' ', asesora: f.asesora || '—',
       q: f.q, vitesWord: f.q === 1 ? 'Vite' : 'Vites', unitStr: money(c.unit), subStr: money(c.sub),
-      tierName: t.nombre, tierRange: rangeOf(t), tierMax: t.desc, d: c.d, x: c.x, xMax: c.xMax,
+      tierName: t.nombre, tierRange: rangeOf(t), tierMax: t.desc, d: pct(c.d), x: pct(c.x), xMax: pct(c.xMax), dRange: c.d, xRange: c.x, xRangeMax: c.xMax,
       hasD: c.d > 0, hasX: f.auth && c.x > 0, dvStr: money(c.dv), xvStr: money(c.xv),
-      totalStr: money(c.total), hasSave: totPct > 0, saveStr: money(c.dv + c.xv), totPct,
+      totalStr: money(c.total), hasSave: totPct > 0, saveStr: money(c.dv + c.xv), totPct: pct(totPct),
       fin: c.fin, abonoIn: c.abono ? money(c.abono) : '', abonoDate: f.abonoDate || f.date, saldoStr: money(c.saldo),
       planNote: c.fin ? `${c.cuotas.length} ${c.cuotas.length === 1 ? 'cuota' : 'cuotas'} sin intereses` : 'Pago único',
       pay, hasDiff: c.fin && diff !== 0, diffMsg: diff > 0 ? `Faltan ${money(diff)} por asignar en las cuotas.` : `Las cuotas superan el saldo por ${money(-diff)}.`,
@@ -773,7 +812,8 @@ class Component extends DCLogic {
     };
 
     const cuotaEd = c.fin && !c.client ? c.cuotas.map((q, i) => ({
-      n: i + 1, vStr: money(q.v), d: q.d,
+      n: i + 1, vStr: money(q.v), d: q.d, fixed: this.ov[i]?.v != null, lockLabel: `Mantener valor cuota ${i + 1}`,
+      onLock: e => { const o = { ...(this.ov[i] || {}) }; if (e.target.checked) o.v = q.v; else delete o.v; this.ov[i] = o; this.forceUpdate(); },
       onV: e => { this.ov[i] = { ...(this.ov[i] || {}), v: digits(e.target.value) }; this.forceUpdate(); },
       onD: e => { this.ov[i] = { ...(this.ov[i] || {}), d: e.target.value }; this.forceUpdate(); }
     })) : [];
@@ -831,6 +871,8 @@ class Component extends DCLogic {
     };
     return {
       cfg, f, p, on, adm, cuotaEd, nOpts, pr,
+      distributionNote: 'Los valores editados se mantienen. El resto se reparte automaticamente.',
+      calc: { value: this.calcNet == null ? '' : money(this.calcNet), change: e => { this.calcNet = e.target.value.trim() === '' ? null : digits(e.target.value); this.forceUpdate(); }, invalid: !!this.discountCalc(c).error, result: this.discountCalc(c).error || `Descuento equivalente: ${pct(this.discountCalc(c).rate)}%. Ahorro: ${money(c.sub - this.calcNet)}.`, apply: () => this.applyDiscount() },
       isPrecios: mode === 'precios', tabP: seg(mode === 'precios'),
       goPrecios: () => this.setState({ mode: 'precios' }),
       copyPrecios: () => this.showLink(location.href.split('#')[0] + '#precios', 'Link de precios actuales'),
@@ -842,7 +884,7 @@ class Component extends DCLogic {
       goAsesora: () => this.setState({ mode: 'asesora' }), goAdmin: () => this.setState({ mode: 'admin' }),
       qMinus: () => this.setQ(f.q - 1), qPlus: () => this.setQ(f.q + 1),
       setContado: () => this.setF({ modo: 'contado' }), setFin: () => this.setF({ modo: 'financiado' }),
-      resetCuotas: () => { this.ov = {}; this.forceUpdate(); },
+      resetCuotas: () => { this.ov = Object.fromEntries(Object.entries(this.ov).map(([i, o]) => [i, { d: o.d }])); this.forceUpdate(); },
       dlPdf: () => this.dlPdf(), dlImg: () => this.dlImg(),
       busyPdf: this.state.busy === 'pdf' ? 'Generando PDF…' : 'Descargar PDF',
       busyImg: this.state.busy === 'img' ? 'Generando…' : 'Descargar imagen',
