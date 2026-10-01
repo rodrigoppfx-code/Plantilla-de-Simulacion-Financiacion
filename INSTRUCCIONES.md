@@ -16,7 +16,7 @@
 
 ## Calculadora de descuento
 
-Abre `Calcular descuento desde el precio final`. Toma la cantidad y precio vigentes de la propuesta. Ingresa el valor final TOTAL, no el valor por Vite. Muestra porcentaje equivalente y ahorro. `Aplicar descuento` conserva ese valor exacto y respeta los topes de categoria y descuento adicional autorizado. Cambiar cantidad, precio o descuento recalcula la propuesta con los datos nuevos.
+Abre `Calcular porcentaje para la app`. Toma la cantidad y precio vigentes de la propuesta. Ingresa el valor final TOTAL, no el valor por Vite. Muestra el porcentaje equivalente sin cambiar la propuesta. La asesora decide si usa ese porcentaje en los campos de descuento, respetando los topes autorizados.
 
 ## Precios actuales
 

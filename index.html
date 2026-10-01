@@ -114,14 +114,13 @@ input[type=checkbox]{accent-color:#1F4D2B}
         </div>
 
         <details style="background:#fff;border:1px solid #E1E3DA;border-radius:12px;padding:16px 20px">
-          <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#1F4D2B">Calcular descuento desde el precio final</summary>
+          <summary style="cursor:pointer;font-size:17px;font-weight:700;color:#17616A">Calcular porcentaje para la app</summary>
           <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px">
             <div style="font-size:13px;color:#5F6B62">{{ p.q }} Vites × {{ p.unitStr }} = {{ p.subStr }}</div>
             <label style="font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:6px">Valor final total para el cliente
               <input aria-label="Valor final total para el cliente" value="{{ calc.value }}" onChange="{{ calc.change }}" inputMode="numeric" style="width:100%;height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:15px">
             </label>
             <div style="font-size:13px;color:#4A564D" role="status">{{ calc.result }}</div>
-            <button disabled="{{ calc.invalid }}" onClick="{{ calc.apply }}" style="width:100%;min-height:40px;border:1px solid #D6DBD0;border-radius:8px;background:#EEF0E9;color:#1F4D2B;font-weight:600;cursor:pointer">Aplicar descuento</button>
           </div>
         </details>
         <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
@@ -680,17 +679,9 @@ class Component extends DCLogic {
   }
   discountCalc(c = this.compute()) {
     const net = this.calcNet, rate = c.sub ? (c.sub - net) * 100 / c.sub : 0;
-    const limit = this.state.f.auth ? this.state.cfg.topeTotal : c.t.desc;
     let error = net == null ? 'Ingresa el valor final total.' : '';
     if (net != null && (!Number.isSafeInteger(net) || net < 0 || net > c.sub)) error = 'El valor final debe estar entre $0 y el valor bruto.';
-    else if (net != null && rate > limit + 1e-9) error = `El descuento supera el ${limit}% permitido${this.state.f.auth ? '.' : '; requiere autorizar el descuento adicional.'}`;
     return { net, rate, error };
-  }
-  applyDiscount() {
-    const c = this.compute(), r = this.discountCalc(c);
-    if (r.error) return;
-    const d = Math.min(r.rate, c.t.desc), x = Math.max(0, r.rate - d);
-    this.setF({ d, x, exact: { net: r.net, sub: c.sub, d, x, auth: this.state.f.auth } });
   }
   linkFor(c) { return location.href.split('#')[0] + '#p=' + enc(JSON.stringify(this.payload(c))); }
 
@@ -871,8 +862,8 @@ class Component extends DCLogic {
     };
     return {
       cfg, f, p, on, adm, cuotaEd, nOpts, pr,
-      distributionNote: 'Los valores editados se mantienen. El resto se reparte automaticamente.',
-      calc: { value: this.calcNet == null ? '' : money(this.calcNet), change: e => { this.calcNet = e.target.value.trim() === '' ? null : digits(e.target.value); this.forceUpdate(); }, invalid: !!this.discountCalc(c).error, result: this.calcNet != null && this.calcNet <= c.sub ? `Descuento equivalente: ${pct(this.discountCalc(c).rate)}%. Ahorro: ${money(c.sub - this.calcNet)}. ${this.discountCalc(c).error}` : this.discountCalc(c).error, apply: () => this.applyDiscount() },
+      distributionNote: 'Los valores editados quedan marcados con un chulito. El resto se reparte automaticamente.',
+      calc: { value: this.calcNet == null ? '' : money(this.calcNet), change: e => { this.calcNet = e.target.value.trim() === '' ? null : digits(e.target.value); this.forceUpdate(); }, result: this.discountCalc(c).error || `Descuento equivalente: ${pct(this.discountCalc(c).rate)}%.` },
       isPrecios: mode === 'precios', tabP: seg(mode === 'precios'),
       goPrecios: () => this.setState({ mode: 'precios' }),
       copyPrecios: () => this.showLink(location.href.split('#')[0] + '#precios', 'Link de precios actuales'),

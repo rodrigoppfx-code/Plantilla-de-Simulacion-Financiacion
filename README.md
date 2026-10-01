@@ -21,7 +21,7 @@ Aplicacion estatica para crear propuestas comerciales de Avovite.
 
 ## Vistas
 
-La calculadora desplegable de descuento usa el valor final total y conserva el neto exacto al aplicar, sin redondearlo a partir del porcentaje mostrado. Respeta los descuentos autorizados. No aparece en la propuesta del cliente.
+`Calcular porcentaje para la app` toma cantidad y precio vigentes y muestra el porcentaje equivalente al valor final total ingresado. Solo sirve para consultar: no cambia la propuesta ni aparece en el documento del cliente.
 
 - `#precios`: abre la tabla de precios actuales.
 - `#p=<datos>`: abre una propuesta para cliente desde un link codificado.
