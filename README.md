@@ -7,7 +7,7 @@ Aplicacion estatica para crear propuestas comerciales de Avovite.
 - `index.html`: aplicacion completa para asesoras, clientes, precios actuales y administrador.
 - `support.js`: runtime requerido por `index.html`.
 - `config.json`: precios, categorias, descuentos, asesoras, beneficios y nota.
-- `assets/logo.png`: logo usado por la aplicacion.
+- `assets/logo.png`: original del logo; el HTML tambien lo incorpora para las vistas y descargas.
 - `legacy/`: respaldo de la version anterior publicada.
 
 ## Uso
@@ -26,4 +26,4 @@ Aplicacion estatica para crear propuestas comerciales de Avovite.
 
 ## Configuracion
 
-El administrador edita `config.json` desde la misma aplicacion. Los cambios locales quedan en este equipo; la publicacion a GitHub requiere un token con permiso de escritura sobre este repositorio.
+El administrador edita `config.json` desde la misma aplicacion. `Guardar cambios` pide la misma clave de acceso y publica para todas las asesoras mediante el servicio `https://avovite-propuestas-admin.vercel.app/api/settings`. No se ingresan tokens en la aplicacion. Las credenciales de publicacion y la verificacion de clave quedan en el servicio, fuera del HTML.

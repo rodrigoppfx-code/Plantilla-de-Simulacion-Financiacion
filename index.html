@@ -398,11 +398,10 @@ input[type=checkbox]{accent-color:#1F4D2B}
         <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
           <div>
             <div style="font-family:Newsreader,serif;font-size:30px;font-weight:500;color:#16361F">Administrador</div>
-            <div style="font-size:14px;color:#5F6B62">Los cambios aplican a todas las asesoras al publicarlos en GitHub.</div>
+            <div style="font-size:14px;color:#5F6B62">Los cambios guardados aplican a todas las asesoras.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onClick="{{ adm.saveLocal }}" style="height:42px;padding:0 16px;border:1px solid #CBD1C4;border-radius:10px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Guardar en este equipo</button>
-            <button onClick="{{ adm.publish }}" style="height:42px;padding:0 16px;border:0;border-radius:10px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#16361F">Guardar y publicar</button>
+            <button onClick="{{ adm.publish }}" style="height:42px;padding:0 16px;border:0;border-radius:10px;background:#1F4D2B;color:#fff;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#16361F">Guardar cambios</button>
           </div>
         </div>
         <sc-if value="{{ hasStatus }}" hint-placeholder-val="{{ false }}">
@@ -480,14 +479,6 @@ input[type=checkbox]{accent-color:#1F4D2B}
         </div>
 
         <div style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
-          <div style="font-size:15px;font-weight:700">Publicación en GitHub</div>
-          <div style="font-size:13px;color:#5F6B62">“Guardar y publicar” actualiza <code>config.json</code> en el repositorio. Las asesoras ven el cambio en 1 a 2 minutos. El token queda guardado solo en este equipo.</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Usuario / organización<input value="{{ adm.gh.owner }}" onChange="{{ adm.onGhOwner }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Repositorio<input value="{{ adm.gh.repo }}" onChange="{{ adm.onGhRepo }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Rama<input value="{{ adm.gh.branch }}" onChange="{{ adm.onGhBranch }}" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#4A564D">Token<input type="password" value="{{ token }}" onChange="{{ adm.onToken }}" placeholder="github_pat_…" style="height:42px;padding:0 12px;border:1px solid #D6DBD0;border-radius:10px;font-size:14px;width:100%;outline:none"></label>
-          </div>
           <div style="display:flex;gap:16px;flex-wrap:wrap">
             <button onClick="{{ adm.download }}" style="border:0;background:none;color:#1F4D2B;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Descargar config.json</button>
             <button onClick="{{ adm.restore }}" style="border:0;background:none;color:#9B3B1C;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline">Restaurar valores iniciales</button>
@@ -496,6 +487,22 @@ input[type=checkbox]{accent-color:#1F4D2B}
       </section>
     </sc-if>
   </main>
+
+  <sc-if value="{{ hasSavePrompt }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(22,54,31,0.35);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px">
+      <div role="dialog" aria-modal="true" aria-label="Confirmar guardado" style="width:100%;max-width:420px;background:#fff;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:20px;font-weight:700;color:#16361F">Confirmar guardado</div>
+        <label style="display:flex;flex-direction:column;gap:8px;font-size:14px">Clave del administrador
+          <input type="password" value="{{ savePass }}" onChange="{{ onSavePass }}" onKeyDown="{{ onSaveKey }}" autoComplete="current-password" style="height:44px;padding:0 12px;border:1px solid #D6DBD0;border-radius:8px;font-size:16px;width:100%">
+        </label>
+        <sc-if value="{{ hasSaveError }}" hint-placeholder-val="{{ false }}"><div role="alert" style="font-size:14px;color:#9B3B1C">{{ saveError }}</div></sc-if>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ cancelSave }}" disabled="{{ saving }}" style="height:42px;padding:0 16px;border:1px solid #CBD1C4;border-radius:8px;background:#fff;color:#1F4D2B;font-weight:600">Cancelar</button>
+          <button onClick="{{ confirmSave }}" disabled="{{ saving }}" style="height:42px;padding:0 16px;border:0;border-radius:8px;background:#1F4D2B;color:#fff;font-weight:700">{{ saveLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{ hasLink }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeLink }}" style="position:fixed;inset:0;background:rgba(22,54,31,0.35);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px">
@@ -547,7 +554,8 @@ const DEF = {
   ],
   github: { owner: 'rodrigoppfx-code', repo: 'Plantilla-de-Simulacion-Financiacion', branch: 'main', path: 'config.json' }
 };
-const LS_CFG = 'avovite_config_v2', LS_TOK = 'avovite_gh_token', PASS = 'Avocate2024*';
+const LS_CFG = 'avovite_config_v2';
+const ADMIN_API = 'https://avovite-propuestas-admin.vercel.app/api/settings';
 const clone = o => JSON.parse(JSON.stringify(o));
 const pad = n => String(n).padStart(2, '0');
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -569,7 +577,7 @@ const isYes = v => /^(si|sí|✓|x)$/i.test(String(v).trim());
 const isNo = v => /^(-|–|no|)$/i.test(String(v).trim());
 
 class Component extends DCLogic {
-  state = { mode: 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', token: '', link: null };
+  state = { mode: 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', link: null, savePrompt: false, savePass: '', saveError: '', saving: false };
   propRef = React.createRef();
   ov = {}; sig = '';
 
@@ -588,7 +596,7 @@ class Component extends DCLogic {
     const h = location.hash || '';
     if (h === '#precios') this.setState({ mode: 'precios' });
     if (h.startsWith('#p=')) { try { this.setState({ mode: 'cliente', f: JSON.parse(dec(h.slice(3))) }); } catch (e) {} }
-    try { this.setState({ token: localStorage.getItem(LS_TOK) || '' }); } catch (e) {}
+    try { localStorage.removeItem('avovite_gh_token'); } catch (e) {}
     this.loadConfig();
   }
 
@@ -596,7 +604,7 @@ class Component extends DCLogic {
     let local = null, remote = null;
     try { local = JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (e) {}
     try { const r = await fetch('config.json?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) remote = await r.json(); } catch (e) {}
-    const pick = [local, remote].filter(Boolean).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+    const pick = remote || local;
     if (!pick) return;
     const cfg = { ...clone(DEF), ...pick, github: { ...DEF.github, ...(pick.github || {}) } };
     this.setState(s => ({ cfg, f: (s.mode === 'cliente' || this.touched) ? s.f : this.newF(cfg) }));
@@ -652,7 +660,11 @@ class Component extends DCLogic {
     const prevW = el.style.width, prevMax = el.style.maxWidth;
     const sc = el.querySelectorAll('[data-scroll]');
     el.style.width = '820px'; el.style.maxWidth = '820px'; sc.forEach(n => n.style.overflowX = 'visible');
-    try { if (document.fonts) await document.fonts.ready; return await window.html2canvas(el, { scale: 2, backgroundColor: '#FBF8F0', useCORS: true }); }
+    try {
+      if (document.fonts) await document.fonts.ready;
+      await Promise.all(Array.from(el.querySelectorAll('img')).map(img => img.decode()));
+      return await window.html2canvas(el, { scale: 2, backgroundColor: '#FBF8F0', useCORS: true });
+    }
     finally { el.style.width = prevW; el.style.maxWidth = prevMax; sc.forEach(n => n.style.overflowX = 'auto'); }
   }
   fileName() { const { f } = this.state; const n = (f.nombre || 'cliente').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); return `propuesta-avovite-${n}-${f.date}`; }
@@ -681,21 +693,23 @@ class Component extends DCLogic {
   }
 
   edit(fn) { this.setState(s => { const d = clone(s.draft); fn(d); return { draft: d }; }); }
+  async adminRequest(body) {
+    let response;
+    try { response = await fetch(ADMIN_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(45000) }); }
+    catch { throw new Error('No se pudo conectar. Intenta de nuevo.'); }
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || 'No se pudo guardar.');
+    return result;
+  }
   async publish() {
-    const cfg = { ...clone(this.state.draft), updatedAt: Date.now() };
-    this.saveLocal(cfg, true);
-    const tok = this.state.token.trim(); const g = cfg.github;
-    if (!tok) { this.setState({ status: 'Guardado en este equipo. Para publicar a todas las asesoras, pega el token de GitHub abajo.' }); return; }
-    this.setState({ status: 'Publicando…' });
+    if (this.state.saving || !this.state.savePass) return;
+    this.setState({ saving: true, saveError: '' });
     try {
-      const url = `https://api.github.com/repos/${g.owner}/${g.repo}/contents/${g.path}`;
-      const hd = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' };
-      let sha; const r0 = await fetch(url + '?ref=' + encodeURIComponent(g.branch), { headers: hd }); if (r0.ok) sha = (await r0.json()).sha;
-      const body = { message: 'Actualizar precios y beneficios (admin)', content: btoa(unescape(encodeURIComponent(JSON.stringify(cfg, null, 2)))), branch: g.branch }; if (sha) body.sha = sha;
-      const r = await fetch(url, { method: 'PUT', headers: { ...hd, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (!r.ok) throw new Error(r.status);
-      this.setState({ status: 'Publicado. Las asesoras verán los cambios en 1 a 2 minutos.' });
-    } catch (e) { this.setState({ status: 'No se pudo publicar (' + e.message + '). Revisa el token y el repositorio. Los cambios sí quedaron en este equipo.' }); }
+      const result = await this.adminRequest({ action: 'save', password: this.state.savePass, config: clone(this.state.draft) });
+      this.saveLocal(result.config, true);
+      this.setState({ savePrompt: false, savePass: '', status: 'Cambios guardados. Todas las asesoras los verán al actualizar la página en 1 a 2 minutos.' });
+    } catch (e) { this.setState({ savePass: '', saveError: e.message }); }
+    this.setState({ saving: false });
   }
   saveLocal(cfg, quiet) {
     cfg = cfg || { ...clone(this.state.draft), updatedAt: Date.now() };
@@ -786,19 +800,21 @@ class Component extends DCLogic {
         del: () => { if (confirm('¿Eliminar el beneficio “' + b.t + '”?')) this.edit(d => d.beneficios.splice(i, 1)); },
         cells: dr.tiers.map((_, j) => ({ v: b.v[j] ?? '', onV: e => this.edit(d => { d.beneficios[i].v[j] = e.target.value; }) })) })),
       addBen: () => this.edit(d => d.beneficios.push({ t: 'Nuevo beneficio', s: '', v: d.tiers.map(() => '-') })),
-      gh: dr.github,
-      onGhOwner: e => this.edit(d => d.github.owner = e.target.value.trim()),
-      onGhRepo: e => this.edit(d => d.github.repo = e.target.value.trim()),
-      onGhBranch: e => this.edit(d => d.github.branch = e.target.value.trim()),
-      onToken: e => { const v = e.target.value; this.setState({ token: v }); try { localStorage.setItem(LS_TOK, v); } catch (x) {} },
-      saveLocal: () => this.saveLocal(),
-      publish: () => this.publish(),
+      publish: () => this.setState({ savePrompt: true, savePass: '', saveError: '' }),
       download: () => { const b = new Blob([JSON.stringify({ ...dr, updatedAt: Date.now() }, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'config.json'; a.click(); },
       restore: () => { if (confirm('¿Restaurar precios, descuentos y beneficios iniciales? (No se publica hasta que guardes)')) this.setState({ draft: clone(DEF), status: 'Valores iniciales cargados. Guarda para aplicarlos.' }); }
     };
     adm.onNewKey = e => { if (e.key === 'Enter') adm.addAsesora(); };
 
-    const doLogin = () => { if (this.state.pass === PASS) this.setState({ adminOk: true, passErr: false, draft: clone(this.state.cfg), status: '' }); else this.setState({ passErr: true }); };
+    const doLogin = async () => {
+      if (this.loggingIn) return;
+      this.loggingIn = true;
+      try {
+        await this.adminRequest({ action: 'login', password: this.state.pass });
+        this.setState({ adminOk: true, pass: '', passErr: false, draft: clone(this.state.cfg), status: '' });
+      } catch (e) { this.setState({ passErr: true, pass: '' }); this.flash(e.message); }
+      this.loggingIn = false;
+    };
 
     const PAL = [{ bg: '#F3F8EE', ac: '#7FA86A', bd: '#E3EDDA' }, { bg: '#E7F1DE', ac: '#4F8A45', bd: '#D5E5C8' }, { bg: '#F8F0DA', ac: '#B08D3C', bd: '#EDE0BC' }, { bg: '#E1EBE3', ac: '#1F4D2B', bd: '#CBDACE' }];
     const pal = x => PAL[cfg.tiers.indexOf(x) % PAL.length];
@@ -837,7 +853,12 @@ class Component extends DCLogic {
       pass: this.state.pass, passErr: this.state.passErr,
       onPass: e => this.setState({ pass: e.target.value, passErr: false }),
       onPassKey: e => { if (e.key === 'Enter') doLogin(); }, doLogin,
-      newAsesora: this.state.newAsesora, token: this.state.token,
+      newAsesora: this.state.newAsesora,
+      hasSavePrompt: this.state.savePrompt, savePass: this.state.savePass, saveError: this.state.saveError,
+      hasSaveError: !!this.state.saveError, saving: this.state.saving, saveLabel: this.state.saving ? 'Guardando…' : 'Guardar',
+      onSavePass: e => this.setState({ savePass: e.target.value, saveError: '' }),
+      onSaveKey: e => { if (e.key === 'Enter') this.publish(); }, confirmSave: () => this.publish(),
+      cancelSave: () => { if (!this.state.saving) this.setState({ savePrompt: false, savePass: '', saveError: '' }); },
       status: this.state.status, hasStatus: !!this.state.status,
       toast: this.state.toast, hasToast: !!this.state.toast
     };
