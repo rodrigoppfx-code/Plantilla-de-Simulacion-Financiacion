@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/index.html" },
+    { "source": "/precios.html", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/precios.html" },
+    { "source": "/support.js", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/support.js" },
+    { "source": "/config.json", "destination": "https://rodrigoppfx-code.github.io/Plantilla-de-Simulacion-Financiacion/config.json" }
+  ],
+  "headers": [
+    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/precios.html", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/config.json", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+  ]
+}

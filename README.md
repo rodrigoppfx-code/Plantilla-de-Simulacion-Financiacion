@@ -2,6 +2,8 @@
 
 Aplicacion estatica para crear propuestas comerciales de Avovite.
 
+Direcciones de uso: `https://propuestas-avovite.vercel.app/` para asesoras y `https://precios-avovite.vercel.app/` para precios publicos. Ambas muestran la fuente de GitHub Pages mediante reglas de Vercel, sin duplicar datos ni diseno. Los enlaces anteriores siguen funcionando.
+
 ## Archivos principales
 
 - `index.html`: aplicacion completa para asesoras, clientes, precios actuales y administrador.
@@ -36,5 +38,7 @@ El administrador edita `config.json` desde la misma aplicacion. `Guardar cambios
 Al seleccionar una tarjeta se resaltan su columna de beneficios, sus filas de precios y el salto desde esa categoria hacia la siguiente. Vite Private no tiene un salto posterior. La seleccion es solo visual y no modifica propuestas, cuotas ni descuentos.
 
 En Precios actuales, el boton Copiar link de pagina publica copia directamente este enlace. Es un enlace publico: cualquier persona que lo reciba puede abrirlo.
+
+Las reglas de publicacion estan en `advisor-host/vercel.json` y `public-prices-host/vercel.json`. Solo permiten las rutas necesarias. El servicio administrador admite el dominio de asesoras y conserva la misma clave y validacion; la pagina publica de precios no permite guardar.
 
 La pagina se genera desde la plantilla unica `index.html`. La tabla marcada `benefits-table:source` se reutiliza en precios con su propio sombreado. Despues de editarla, ejecutar `node build-public-page.cjs` antes de publicar ambos HTML. No editar la tabla generada ni `precios.html` manualmente ni duplicar configuraciones.

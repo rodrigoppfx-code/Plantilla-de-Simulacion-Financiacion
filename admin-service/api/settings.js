@@ -1,6 +1,6 @@
 const { scryptSync, timingSafeEqual } = require('node:crypto');
 const attempts = new Map();
-const origin = 'https://rodrigoppfx-code.github.io';
+const origins = new Set(['https://rodrigoppfx-code.github.io', 'https://propuestas-avovite.vercel.app']);
 const repository = 'rodrigoppfx-code/Plantilla-de-Simulacion-Financiacion';
 
 function validateConfig(input) {
@@ -26,7 +26,8 @@ function validateConfig(input) {
 async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Vary', 'Origin');
-  if (req.headers.origin && req.headers.origin !== origin) return res.status(403).json({ error: 'Origen no permitido.' });
+  const origin = req.headers.origin || 'https://rodrigoppfx-code.github.io';
+  if (!origins.has(origin)) return res.status(403).json({ error: 'Origen no permitido.' });
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

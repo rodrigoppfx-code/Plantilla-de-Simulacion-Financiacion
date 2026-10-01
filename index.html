@@ -633,6 +633,7 @@ const benefitsTable = (cfg, selected) => {
   ] };
 };
 const PUBLIC_PRICES = /\/precios\.html$/i.test(location.pathname || '');
+const PUBLIC_PRICES_URL = 'https://precios-avovite.vercel.app/';
 
 class Component extends DCLogic {
   state = { mode: PUBLIC_PRICES ? 'precios' : 'asesora', cfg: clone(DEF), f: this.newF(DEF), pass: '', passErr: false, adminOk: false, draft: null, newAsesora: '', status: '', toast: '', busy: '', link: null, savePrompt: false, savePass: '', saveError: '', saving: false, configReady: !PUBLIC_PRICES, configError: false };
@@ -926,7 +927,7 @@ class Component extends DCLogic {
       isPriceLoading: PUBLIC_PRICES && !this.state.configReady && !this.state.configError, hasPriceError: PUBLIC_PRICES && this.state.configError, retryPrices: () => this.loadConfig(),
       isPrecios: mode === 'precios' && this.state.configReady, tabP: seg(mode === 'precios'),
       goPrecios: () => this.setState({ mode: 'precios' }),
-      copyPrecios: async () => { const url = new URL('precios.html', location.href); url.search = ''; url.hash = ''; const ok = await this.copyText(url.href); this.flash(ok ? 'Link copiado' : 'No se pudo copiar. Revisa los permisos del navegador e intenta nuevamente.'); },
+      copyPrecios: async () => { const ok = await this.copyText(PUBLIC_PRICES_URL); this.flash(ok ? 'Link copiado' : 'No se pudo copiar. Revisa los permisos del navegador e intenta nuevamente.'); },
       asesoras: cfg.asesoras.length ? cfg.asesoras : ['—'],
       isAsesora: mode === 'asesora', isCliente: mode === 'cliente', notCliente: !PUBLIC_PRICES && mode !== 'cliente',
       showProposal: mode === 'asesora' || mode === 'cliente',
