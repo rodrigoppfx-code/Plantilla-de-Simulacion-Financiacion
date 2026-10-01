@@ -14,11 +14,11 @@
 10. Descarga PDF, imagen o copia el link del cliente.
 11. Pulsa `Nueva propuesta` para recargar la pagina, limpiar el formulario y traer la configuracion vigente.
 
-## Precios actuales
-
 ## Calculadora de descuento
 
 Abre `Calcular descuento desde el precio final`. Toma la cantidad y precio vigentes de la propuesta. Ingresa el valor final TOTAL, no el valor por Vite. Muestra porcentaje equivalente y ahorro. `Aplicar descuento` conserva ese valor exacto y respeta los topes de categoria y descuento adicional autorizado. Cambiar cantidad, precio o descuento recalcula la propuesta con los datos nuevos.
+
+## Precios actuales
 
 Abre `Precios actuales` en el menu o usa la URL con `#precios`.
 

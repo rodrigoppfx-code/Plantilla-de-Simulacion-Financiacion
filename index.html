@@ -872,7 +872,7 @@ class Component extends DCLogic {
     return {
       cfg, f, p, on, adm, cuotaEd, nOpts, pr,
       distributionNote: 'Los valores editados se mantienen. El resto se reparte automaticamente.',
-      calc: { value: this.calcNet == null ? '' : money(this.calcNet), change: e => { this.calcNet = e.target.value.trim() === '' ? null : digits(e.target.value); this.forceUpdate(); }, invalid: !!this.discountCalc(c).error, result: this.discountCalc(c).error || `Descuento equivalente: ${pct(this.discountCalc(c).rate)}%. Ahorro: ${money(c.sub - this.calcNet)}.`, apply: () => this.applyDiscount() },
+      calc: { value: this.calcNet == null ? '' : money(this.calcNet), change: e => { this.calcNet = e.target.value.trim() === '' ? null : digits(e.target.value); this.forceUpdate(); }, invalid: !!this.discountCalc(c).error, result: this.calcNet != null && this.calcNet <= c.sub ? `Descuento equivalente: ${pct(this.discountCalc(c).rate)}%. Ahorro: ${money(c.sub - this.calcNet)}. ${this.discountCalc(c).error}` : this.discountCalc(c).error, apply: () => this.applyDiscount() },
       isPrecios: mode === 'precios', tabP: seg(mode === 'precios'),
       goPrecios: () => this.setState({ mode: 'precios' }),
       copyPrecios: () => this.showLink(location.href.split('#')[0] + '#precios', 'Link de precios actuales'),
