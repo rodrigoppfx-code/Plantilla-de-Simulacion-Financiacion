@@ -29,3 +29,10 @@ Aplicacion estatica para crear propuestas comerciales de Avovite.
 ## Configuracion
 
 El administrador edita `config.json` desde la misma aplicacion. `Guardar cambios` pide la misma clave de acceso y publica para todas las asesoras mediante el servicio `https://avovite-propuestas-admin.vercel.app/api/settings`. No se ingresan tokens en la aplicacion. Las credenciales de publicacion y la verificacion de clave quedan en el servicio, fuera del HTML.
+# Pagina publica de precios y beneficios
+
+`precios.html` muestra los precios, beneficios comunes y beneficios por categoria sin navegacion al simulador ni al administrador. Lee el mismo `config.json` remoto al abrir o actualizar la pagina. Si no puede cargarlo, ofrece reintentar en lugar de mostrar precios locales desactualizados.
+
+En Precios actuales, el boton Copiar link de pagina publica copia directamente este enlace. Es un enlace publico: cualquier persona que lo reciba puede abrirlo.
+
+La pagina se genera desde la plantilla unica `index.html`. Despues de editarla, ejecutar `node build-public-page.cjs` antes de publicar ambos HTML. No editar `precios.html` manualmente ni duplicar configuraciones.
