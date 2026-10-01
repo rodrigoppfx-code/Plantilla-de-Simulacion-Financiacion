@@ -16,6 +16,8 @@
 
 ## Calculadora de descuento
 
+Los campos de descuento de compra y adicional aceptan coma o punto y hasta seis decimales. Para un descuento total autorizado del 22%, coloca el descuento de compra en 0%, marca `Autorizo un descuento adicional` y escribe 22 en el adicional. El tope total vigente es 30%; esto no autoriza una promocion que aun no se haya confirmado.
+
 Abre `Calcular porcentaje para la app`. Toma la cantidad y precio vigentes de la propuesta. Ingresa el valor final TOTAL, no el valor por Vite. Muestra el porcentaje equivalente sin cambiar la propuesta. La asesora decide si usa ese porcentaje en los campos de descuento, respetando los topes autorizados.
 
 ## Precios actuales
