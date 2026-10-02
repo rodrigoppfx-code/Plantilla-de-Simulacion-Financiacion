@@ -408,6 +408,7 @@ input,select{font-size:16px !important}
             <div style="font-size:14px;color:#5F6B62">Valor por Vite {{ pr.unitStr }} · descuentos máximos por categoría</div>
           </div>
           <sc-if value="{{ canCopyPublicPrices }}"><button data-r="pr-copy" onClick="{{ copyPrecios }}" style="min-height:40px;padding:8px 14px;border:1px solid #CBD1C4;border-radius:10px;background:#fff;color:#1F4D2B;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#EEF3EA">Copiar link de página pública</button></sc-if>
+          <a href="https://wa.me/573148058249?text=Hola%20Revise%20los%20Beneficios%20y%20quiero%20mis%20Vites" target="_blank" rel="noopener noreferrer" aria-label="Hablar con un asesor por WhatsApp" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;box-sizing:border-box;max-width:100%;border-radius:10px;background:#128C7E;color:#fff;text-decoration:none;font-family:inherit;font-size:14px;font-weight:600;text-align:center">Hablar con un asesor</a>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
           <sc-for list="{{ pr.tiers }}" as="t" hint-placeholder-count="4">
