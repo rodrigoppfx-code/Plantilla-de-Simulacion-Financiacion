@@ -1,0 +1,26 @@
+name: Publicar precios-avovite
+on:
+  push:
+    branches: [main]
+    paths: ['api/**', 'lib/**', 'precios.html', 'public-prices-host/**', 'assets/**', 'scripts/prepare-public-prices.sh']
+  workflow_dispatch:
+concurrency: deploy-precios
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_D7s72tt9ku3dnU1EnQp5Aibs
+      VERCEL_PROJECT_ID: prj_cDdHv49CYriDulGnYabidrsp5Mfo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Comprobar que la pagina se genera
+        run: node -e "const {renderDocument}=require('./lib/public-prices.cjs');const {enhanceHtml}=require('./lib/public-prices-ux.cjs');const h=enhanceHtml(renderDocument(require('./config.json')));if(!h.includes('av-hint'))process.exit(1)"
+      - name: Preparar archivos
+        run: ./scripts/prepare-public-prices.sh dist-precios
+      - name: Publicar en Vercel
+        working-directory: dist-precios
+        run: |
+          mkdir -p .vercel && echo "{\"orgId\":\"$VERCEL_ORG_ID\",\"projectId\":\"$VERCEL_PROJECT_ID\"}" > .vercel/project.json
+          npx --yes vercel@latest deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
