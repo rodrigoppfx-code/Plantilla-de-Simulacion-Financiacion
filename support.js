@@ -29,7 +29,7 @@
       scriptEl?.getAttribute("data-props") ?? null
     );
     return {
-      template: dc.innerHTML,
+      template: doc.querySelector('script[data-dc-template]') ? JSON.parse(doc.querySelector('script[data-dc-template]').textContent) : dc.innerHTML,
       js: scriptEl ? scriptEl.textContent || "" : "",
       props,
       preview
@@ -155,7 +155,7 @@
     runtime.markFetched(rootName);
     runtime.setRootName(rootName);
     runtime.adoptParsed(rootName, parsed);
-    if (!window.__resources) {
+    if (!window.__resources && !doc.querySelector('script[data-dc-template]')) {
       fetch(location.href).then((res) => res.ok ? res.text() : "").then((t) => {
         const raw = t ? parseDcText(t) : null;
         if (raw?.template) runtime.updateHtml(rootName, raw.template);

@@ -12,3 +12,7 @@ source = source.replace(/<!-- benefits-table:prices -->[\s\S]*?<!-- benefits-tab
 fs.writeFileSync(indexPath, source);
 const publicPage = source.replace('<title>Propuestas comerciales · Avovite</title>', '<title>Precios y beneficios · Avovite</title>');
 fs.writeFileSync(path.join(__dirname, 'precios.html'), publicPage);
+// Preserve original attribute casing without fetching the HTML again at startup.
+const advisorPage = source.replace(/<x-dc>([\s\S]*?)<\/x-dc>/, (_, template) =>
+  '<x-dc></x-dc><script type="application/json" data-dc-template>' + JSON.stringify(template).replace(/</g, '\\u003c') + '</script>');
+fs.writeFileSync(path.join(__dirname, 'advisor.html'), advisorPage);

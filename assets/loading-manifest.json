@@ -1,5 +1,5 @@
 {
-  "runtime": "assets/vendor/app-runtime.2ba0728f9ce1.js",
+  "runtime": "assets/vendor/app-runtime.d9d28f739ab9.js",
   "fontCss": "assets/fonts/typefaces.2ea1c874bcc5.css",
   "fonts": [
     "assets/fonts/figtree.bf7828e2c258.woff2",
@@ -10,7 +10,7 @@
   ],
   "logo": "assets/images/logo.1e8a925fd6aa.webp",
   "files": [
-    "assets/vendor/app-runtime.2ba0728f9ce1.js",
+    "assets/vendor/app-runtime.d9d28f739ab9.js",
     "assets/fonts/typefaces.2ea1c874bcc5.css",
     "assets/fonts/figtree.bf7828e2c258.woff2",
     "assets/fonts/figtree.4ba7d3d09669.woff2",

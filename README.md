@@ -37,6 +37,12 @@ En celular, al seleccionar una categoria en precios, la pagina baja hasta `Compa
 El administrador edita `config.json` desde la misma aplicacion. `Guardar cambios` pide la misma clave de acceso y publica para todas las asesoras mediante el servicio `https://avovite-propuestas-admin.vercel.app/api/settings`. No se ingresan tokens en la aplicacion. Las credenciales de publicacion y la verificacion de clave quedan en el servicio, fuera del HTML.
 # Pagina publica de precios y beneficios
 
+La tabla incluye 1 a 15 Vites y 20 Vites. Todos los valores usan la configuracion del administrador.
+
+El simulador comprueba la fecha de Bogota al recuperar el foco, cada minuto visible y antes de compartir o descargar. Conserva fechas de pago editadas y la fecha original de los enlaces de clientes. Los cambios remotos de configuracion requieren aplicar la actualizacion si hay una propuesta en curso.
+
+`build-public-page.cjs` tambien genera `advisor.html`, usado como `index.html` en el dominio de asesoras. Incluye la plantilla original como JSON para evitar la segunda descarga y reconstruccion del documento durante el inicio. Regenerar el runtime con `work/build-advisor-runtime.cjs` si cambia `support.js`.
+
 El dominio publico sirve HTML completo desde `api/prices.js`, generado con `lib/public-prices.cjs`. Los precios se ven antes de ejecutar JavaScript y no requieren React ni una segunda consulta del navegador. La seleccion de categorias conserva el mismo comportamiento.
 
 `work/build-public-renderer.cjs` extrae la plantilla, estilos y calculos de `index.html`; regenerar este archivo antes de desplegar cambios visuales o de calculo. El servidor lee el mismo `config.json` del administrador, con cache breve y actualizacion dentro del intervalo de 1 a 2 minutos anunciado al guardar. GitHub Pages mantiene la pagina compatible anterior.

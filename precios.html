@@ -23,7 +23,7 @@ window.__avoviteConfigRequest = (async () => {
   return null;
 })();
 </script>
-<script defer src="./assets/vendor/app-runtime.2ba0728f9ce1.js"></script>
+<script defer src="./assets/vendor/app-runtime.d9d28f739ab9.js"></script>
 </head>
 <body>
 <x-dc>
@@ -141,6 +141,7 @@ input,select{font-size:16px !important}
     <!-- ===== FORMULARIO ASESORA ===== -->
     <sc-if value="{{ isAsesora }}" hint-placeholder-val="{{ true }}">
       <section data-screen-label="Formulario asesora" data-r="form" style="flex:1 1 360px;max-width:460px;display:flex;flex-direction:column;gap:16px">
+        <sc-if value="{{ hasConfigUpdate }}"><div role="status" style="padding:12px;background:#EEF3EA;border-radius:8px;font-size:14px">Hay precios o beneficios actualizados. <button onClick="{{ acceptConfigUpdate }}" style="padding:8px;border:1px solid #CBD1C4;border-radius:8px;background:#fff;cursor:pointer">Actualizar esta propuesta</button></div></sc-if>
 
         <div data-r="card" style="background:#fff;border:1px solid #E1E3DA;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
           <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:50%;background:#1F4D2B;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center">1</span><span style="font-size:15px;font-weight:700">Cliente</span></div>
@@ -690,7 +691,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 const pad = n => String(n).padStart(2, '0');
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const parseIso = s => { const [y, m, d] = String(s || '').split('-').map(Number); return y ? new Date(y, m - 1, d) : new Date(); };
-const todayIso = () => iso(new Date());
+const todayIso = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const addMonths = (s, k) => { const d = parseIso(s), day = d.getDate(); const t = new Date(d.getFullYear(), d.getMonth() + k, 1); const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate(); t.setDate(Math.min(day, last)); return iso(t); };
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const fLong = s => cap(parseIso(s).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
@@ -747,10 +748,39 @@ class Component extends DCLogic {
     if (!PUBLIC_PRICES && h.startsWith('#p=')) { try { this.setState({ mode: 'cliente', f: JSON.parse(dec(h.slice(3))) }); } catch (e) {} }
     try { localStorage.removeItem('avovite_gh_token'); } catch (e) {}
     this.loadConfig();
+    this.onResume = () => {
+      if (document.visibilityState === 'hidden') return;
+      this.syncDate();
+      if (Date.now() - (this.lastConfigCheck || 0) > 60000) this.loadConfig(true);
+    };
+    document.addEventListener('visibilitychange', this.onResume);
+    window.addEventListener('focus', this.onResume);
+    this.refreshTimer = setInterval(this.onResume, 60000);
   }
 
-  async loadConfig() {
-    if (PUBLIC_PRICES) this.setState({ configReady: false, configError: false });
+  componentWillUnmount() {
+    document.removeEventListener('visibilitychange', this.onResume);
+    window.removeEventListener('focus', this.onResume);
+    clearInterval(this.refreshTimer);
+  }
+
+  syncDate() {
+    if (this.state.mode === 'cliente') return;
+    const date = todayIso();
+    if (this.state.f.date !== date) this.setState(s => ({ f: { ...s.f, date, ...(!this.depositDateEdited && s.f.abonoDate === s.f.date ? { abonoDate: date } : {}) } }));
+  }
+
+  async prepareProposal() {
+    this.syncDate();
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+
+  async loadConfig(background = false) {
+    if (this.loadingConfig) return;
+    this.loadingConfig = true;
+    this.lastConfigCheck = Date.now();
+    try {
+    if (PUBLIC_PRICES && !background) this.setState({ configReady: false, configError: false });
     let local = null, remote = null;
     try { local = JSON.parse(localStorage.getItem(LS_CFG) || 'null'); } catch (e) {}
     const direct = /^(propuestas-avovite|precios-avovite)\.vercel\.app$/.test(location.hostname || '');
@@ -767,7 +797,10 @@ class Component extends DCLogic {
     if (PUBLIC_PRICES && !pick) { this.setState({ configError: true }); return; }
     if (!pick) return;
     const cfg = { ...clone(DEF), ...pick, github: { ...DEF.github, ...(pick.github || {}) } };
+    if (background && JSON.stringify(cfg) === JSON.stringify(this.state.cfg)) return;
+    if (this.touched && this.state.mode !== 'cliente') { this.setState({ pendingConfig: cfg }); return; }
     this.setState(s => ({ cfg, configReady: true, configError: false, f: (s.mode === 'cliente' || this.touched) ? s.f : this.newF(cfg) }));
+    } finally { this.loadingConfig = false; }
   }
 
   selectPriceTier(name) {
@@ -780,7 +813,7 @@ class Component extends DCLogic {
     });
   }
 
-  setF(patch) { this.touched = true; this.setState(s => ({ f: { ...s.f, ...(['q','d','x','auth'].some(k => k in patch) ? { exact: null } : {}), ...patch } })); }
+  setF(patch) { this.touched = true; if ('abonoDate' in patch) this.depositDateEdited = true; this.setState(s => ({ f: { ...s.f, ...(['q','d','x','auth'].some(k => k in patch) ? { exact: null } : {}), ...patch } })); }
   editPercent(key, value, slider = false) {
     const raw = String(value).trim().replace('.', ',');
     if (!/^\d*(,\d*)?$/.test(raw)) return;
@@ -877,6 +910,7 @@ class Component extends DCLogic {
   }
 
   async capture() {
+    await this.prepareProposal();
     await this.loadExportLibrary('html2canvas', './assets/vendor/html2canvas.min.js');
     const el = this.propRef.current; if (!el) throw new Error('no-proposal');
     const prevW = el.style.width, prevMax = el.style.maxWidth;
@@ -1046,7 +1080,7 @@ class Component extends DCLogic {
       benefits: benefitsTable(cfg, priceIndex),
       unitStr: money(cfg.precio), ups,
       tiers: cfg.tiers.map((x, j) => ({ ac: pal(x).ac, bg: j === priceIndex ? '#E8EEDD' : '#fff', bd: j === priceIndex ? '#1F4D2B' : '#E1E3DA', selected: j === priceIndex, selectLabel: `Seleccionar ${x.nombre}`, select: () => this.selectPriceTier(x.nombre), nombre: x.nombre, range: rangeOf(x), desc: x.desc, unitStr: money(cfg.precio), netStr: money(cfg.precio - Math.round(cfg.precio * x.desc / 100)), saveStr: money(cfg.precio * x.desc / 100) })),
-      rows: Array.from({ length: 12 }, (_, i) => { const q = i + 1, x = tierFor(cfg, q), sub = q * cfg.precio, sv = Math.round(sub * x.desc / 100); return { q, tier: x.nombre, sub: money(sub), pct: x.desc, net: money(sub - sv), save: money(sv), bg: cfg.tiers.indexOf(x) === priceIndex ? '#E8EEDD' : '#fff', bd: (q > 1 && tierFor(cfg, q - 1) !== x) ? '#C9CFC0' : '#EEF0EA', ac: pal(x).ac }; })
+      rows: [...Array.from({ length: 15 }, (_, i) => i + 1), 20].map(q => { const x = tierFor(cfg, q), sub = q * cfg.precio, sv = Math.round(sub * x.desc / 100); return { q, tier: x.nombre, sub: money(sub), pct: x.desc, net: money(sub - sv), save: money(sv), bg: cfg.tiers.indexOf(x) === priceIndex ? '#E8EEDD' : '#fff', bd: (q > 1 && tierFor(cfg, q - 1) !== x) ? '#C9CFC0' : '#EEF0EA', ac: pal(x).ac }; })
     };
     return {
       cfg, f, p, on, adm, cuotaEd, nOpts, pr,
@@ -1060,6 +1094,8 @@ class Component extends DCLogic {
       copyPrecios: async () => { const ok = await this.copyText(PUBLIC_PRICES_URL); this.flash(ok ? 'Link copiado' : 'No se pudo copiar. Revisa los permisos del navegador e intenta nuevamente.'); },
       asesoras: cfg.asesoras.length ? cfg.asesoras : ['—'],
       isAsesora: mode === 'asesora', isCliente: mode === 'cliente', notCliente: !PUBLIC_PRICES && mode !== 'cliente',
+      hasConfigUpdate: !!this.state.pendingConfig,
+      acceptConfigUpdate: () => this.setState({ cfg: this.state.pendingConfig, pendingConfig: null }),
       showProposal: mode === 'asesora' || mode === 'cliente',
       isAdminLogin: mode === 'admin' && !this.state.adminOk, isAdminOk: mode === 'admin' && this.state.adminOk,
       tabA: seg(mode === 'asesora'), tabB: seg(mode === 'admin'), segC: seg(!c.fin), segF: seg(c.fin),
@@ -1070,11 +1106,11 @@ class Component extends DCLogic {
       dlPdf: () => this.dlPdf(), dlImg: () => this.dlImg(),
       busyPdf: this.state.busy === 'pdf' ? 'Generando PDF…' : 'Descargar PDF',
       busyImg: this.state.busy === 'img' ? 'Generando…' : 'Descargar imagen',
-      copyLink: () => { if (!this.guard()) return; this.showLink(this.linkFor(c), 'Link de la propuesta'); },
+      copyLink: async () => { if (!this.guard()) return; await this.prepareProposal(); this.showLink(this.linkFor(this.compute()), 'Link de la propuesta'); },
       hasLink: !!this.state.link, linkUrl: this.state.link?.url || '', linkTitle: this.state.link?.title || '', linkMsg: this.state.link?.msg || '',
       closeLink: () => this.setState({ link: null }), stop: e => e.stopPropagation(), selectAll: e => e.target.select(),
-      doCopy: async () => { const ok = await this.copyText(this.state.link.url); this.setState(s => ({ link: { ...s.link, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'No se pudo copiar automáticamente: mantén presionado el link y elige Copiar.' } })); },
-      doOpen: () => window.open(this.state.link.url, '_blank'),
+      doCopy: async () => { await this.prepareProposal(); const url = this.linkFor(this.compute()); const ok = await this.copyText(url); this.setState(s => ({ link: { ...s.link, url, msg: ok ? 'Link copiado. Pégalo en WhatsApp o en el correo del cliente.' : 'No se pudo copiar automáticamente: mantén presionado el link y elige Copiar.' } })); },
+      doOpen: async () => { await this.prepareProposal(); window.open(this.linkFor(this.compute()), '_blank'); },
       resetAll: () => { history.replaceState(null, '', location.pathname + location.search); location.reload(); },
       propRef: this.propRef,
       pass: this.state.pass, passErr: this.state.passErr,
