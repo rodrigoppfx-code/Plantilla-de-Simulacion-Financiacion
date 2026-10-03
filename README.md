@@ -56,3 +56,10 @@ En Precios actuales, el boton Copiar link de pagina publica copia directamente e
 Las reglas de publicacion estan en `advisor-host/vercel.json` y `public-prices-host/vercel.json`. Solo permiten las rutas necesarias. El servicio administrador admite el dominio de asesoras y conserva la misma clave y validacion; la pagina publica de precios no permite guardar.
 
 La pagina se genera desde la plantilla unica `index.html`. La tabla marcada `benefits-table:source` se reutiliza en precios con su propio sombreado. Despues de editarla, ejecutar `node build-public-page.cjs` antes de publicar ambos HTML. No editar la tabla generada ni `precios.html` manualmente ni duplicar configuraciones.
+
+## Mejoras de experiencia en la pagina publica (lib/public-prices-ux.cjs)
+
+Se inyectan desde `api/prices.js`, solo en precios-avovite. No cambian precios, calculos ni la app de asesoras, y no se pierden al regenerar `lib/public-prices.cjs`.
+- Mensaje "Selecciona tu plan y mira tus beneficios" sobre las tarjetas; se oculta tras la primera seleccion.
+- Al seleccionar, baja a `Compara los beneficios` (celular y escritorio) y en celular centra la columna del plan elegido.
+- En tablas que no caben (celular), barra verde arrastrable arriba y abajo de cada tabla, sombra en el borde derecho y aviso "Desliza".

@@ -1,4 +1,5 @@
 const { renderDocument } = require('../lib/public-prices.cjs');
+const { enhanceHtml } = require('../lib/public-prices-ux.cjs');
 const source = 'https://raw.githubusercontent.com/rodrigoppfx-code/Plantilla-de-Simulacion-Financiacion/main/config.json';
 let cached, expires = 0, pending;
 
@@ -20,7 +21,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
   if (!['GET','HEAD'].includes(req.method)) return res.status(405).end();
   try {
-    const html = renderDocument(await currentConfig());
+    const html = enhanceHtml(renderDocument(await currentConfig()));
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30');
     return res.status(200).send(req.method === 'HEAD' ? '' : html);
