@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
   try {
     const html = enhanceHtml(renderDocument(await currentConfig()));
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30');
+    res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=604800');
     return res.status(200).send(req.method === 'HEAD' ? '' : html);
   } catch {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

@@ -63,3 +63,7 @@ Se inyectan desde `api/prices.js`, solo en precios-avovite. No cambian precios, 
 - Mensaje "Selecciona tu plan y mira tus beneficios" sobre las tarjetas; se oculta tras la primera seleccion.
 - Al seleccionar, baja a `Compara los beneficios` (celular y escritorio) y en celular centra la columna del plan elegido.
 - En tablas que no caben (celular), barra verde arrastrable arriba y abajo de cada tabla, sombra en el borde derecho y aviso "Desliza".
+
+## Velocidad de carga
+
+`api/prices.js` responde con `stale-while-revalidate` de 7 dias: Vercel entrega al instante la ultima pagina guardada y actualiza los precios en segundo plano. Un cambio de precios aparece en la visita siguiente a la primera consulta posterior a 60 segundos.
