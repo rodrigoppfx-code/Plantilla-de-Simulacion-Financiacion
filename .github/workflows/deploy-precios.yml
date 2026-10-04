@@ -23,4 +23,9 @@ jobs:
         working-directory: dist-precios
         run: |
           mkdir -p .vercel && echo "{\"orgId\":\"$VERCEL_ORG_ID\",\"projectId\":\"$VERCEL_PROJECT_ID\"}" > .vercel/project.json
-          npx --yes vercel@latest deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then echo "::error::Falta el secreto VERCEL_TOKEN"; exit 1; fi
+          set +e
+          npx --yes vercel@latest deploy --prod --yes --scope "$VERCEL_ORG_ID" --token "${{ secrets.VERCEL_TOKEN }}" > out.txt 2>&1
+          code=$?
+          cat out.txt
+          if [ $code -ne 0 ]; then echo "::error::$(tail -c 900 out.txt | tr '\n' ' ')"; exit $code; fi
