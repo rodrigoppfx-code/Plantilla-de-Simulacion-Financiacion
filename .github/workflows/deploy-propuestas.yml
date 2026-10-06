@@ -1,0 +1,30 @@
+name: Publicar propuestas-avovite
+on:
+  workflow_dispatch:
+concurrency: deploy-propuestas
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_D7s72tt9ku3dnU1EnQp5Aibs
+      VERCEL_PROJECT_NAME: propuestas-avovite
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Preparar archivos
+        run: |
+          # Mismos archivos que precios, con advisor.html como portada y las reglas del dominio de asesoras.
+          ./scripts/prepare-public-prices.sh dist-propuestas
+          cp advisor.html dist-propuestas/index.html
+          cp advisor-host/vercel.json dist-propuestas/vercel.json
+      - name: Publicar en Vercel
+        working-directory: dist-propuestas
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then echo "::error::Falta el secreto VERCEL_TOKEN"; exit 1; fi
+          set +e
+          npx --yes vercel@latest link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token "${{ secrets.VERCEL_TOKEN }}" > out.txt 2>&1 \
+            && npx --yes vercel@latest deploy --prod --yes --scope "$VERCEL_ORG_ID" --token "${{ secrets.VERCEL_TOKEN }}" >> out.txt 2>&1
+          code=$?
+          cat out.txt
+          if [ $code -ne 0 ]; then echo "::error::$(tail -c 900 out.txt | tr '\n' ' ')"; exit $code; fi
