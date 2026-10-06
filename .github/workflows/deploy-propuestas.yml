@@ -18,6 +18,8 @@ jobs:
           ./scripts/prepare-public-prices.sh dist-propuestas
           cp advisor.html dist-propuestas/index.html
           cp advisor-host/vercel.json dist-propuestas/vercel.json
+          # La pagina de precios en servidor solo vive en precios-avovite.
+          rm -rf dist-propuestas/api/prices.js dist-propuestas/lib
       - name: Publicar en Vercel
         working-directory: dist-propuestas
         run: |
