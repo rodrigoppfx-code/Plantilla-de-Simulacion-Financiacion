@@ -45,9 +45,9 @@ const DEF = {
   ],
   beneficios: [
     { t: 'Único pago por 20 años de ingresos en automático', s: '', v: ['si', 'si', 'si', 'si'] },
-    { t: 'Beneficiario para tus Vites sin costo', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Beneficiario para tus VITEs, sin costo', s: '', v: ['si', 'si', 'si', 'si'] },
     { t: 'Visitas a la finca, acceso a plataforma, documentos, fotos e informes', s: '', v: ['si', 'si', 'si', 'si'] },
-    { t: 'Póliza agrícola para tus Vites', s: '', v: ['si', 'si', 'si', 'si'] },
+    { t: 'Póliza agrícola incluida para tus VITEs', s: '', v: ['si', 'si', 'si', 'si'] },
     { t: 'Caja sorpresa “De la finca a tu casa”', s: '', v: ['-', '1 vez', '1 vez', '1 vez'] },
     { t: 'Tour del Aguacate: experiencia inmersiva + acompañante', s: '', v: ['-', '-', '1 vez + 1 acompañante', '1 vez + 2 acompañantes'] },
     { t: 'Sesión en vivo con directivos Avovite', s: '', v: ['-', '-', 'si', 'si'] },
@@ -86,7 +86,7 @@ const benefitsTable = (cfg, selected) => {
   }) });
   return { heads, rows: [
     row('Cantidad de Vites', '', cfg.tiers.map(rangeOf)),
-    row('Descuentos en productos Avovite y compra de tus Vites', '', cfg.tiers.map(x => x.desc === x.prod ? `Hasta ${x.desc}%` : `Productos: hasta ${x.prod}% · Compra: hasta ${x.desc}%`)),
+    row('Descuentos en productos AVOVITE y en la compra de tus VITEs', '', cfg.tiers.map(x => x.desc === x.prod ? `Hasta ${x.desc}%` : `Productos: hasta ${x.prod}% · Compra: hasta ${x.desc}%`)),
     ...cfg.beneficios.map(b => row(b.t, b.s, cfg.tiers.map((_, j) => b.v[j] ?? '-')))
   ] };
 };
