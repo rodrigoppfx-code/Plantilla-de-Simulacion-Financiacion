@@ -6,7 +6,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      VERCEL_ORG_ID: team_D7s72tt9ku3dnU1EnQp5Aibs
+      VERCEL_SCOPE: team_D7s72tt9ku3dnU1EnQp5Aibs
       VERCEL_PROJECT_NAME: propuestas-avovite
     steps:
       - uses: actions/checkout@v4
@@ -25,8 +25,8 @@ jobs:
         run: |
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then echo "::error::Falta el secreto VERCEL_TOKEN"; exit 1; fi
           set +e
-          npx --yes vercel@latest link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token "${{ secrets.VERCEL_TOKEN }}" > out.txt 2>&1 \
-            && npx --yes vercel@latest deploy --prod --yes --scope "$VERCEL_ORG_ID" --token "${{ secrets.VERCEL_TOKEN }}" >> out.txt 2>&1
+          npx --yes vercel@latest link --yes --project "$VERCEL_PROJECT_NAME" --scope "$VERCEL_SCOPE" --token "${{ secrets.VERCEL_TOKEN }}" > out.txt 2>&1 \
+            && npx --yes vercel@latest deploy --prod --yes --scope "$VERCEL_SCOPE" --token "${{ secrets.VERCEL_TOKEN }}" >> out.txt 2>&1
           code=$?
           cat out.txt
           if [ $code -ne 0 ]; then echo "::error::$(tail -c 900 out.txt | tr '\n' ' ')"; exit $code; fi
